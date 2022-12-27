@@ -1,0 +1,63 @@
+{
+    "name": "Dont-code Services",
+    "id": "dont-code-services",
+    "packaging_format": 1,
+    "description": {
+        "en": "Install services and databases needed to support Dont-code platform",
+        "fr": "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
+    },
+    "version": "0.2~ynh1",
+    "url": "https://dont-code.net",
+    "upstream": {
+        "license": "free",
+        "website": "https://dont-code.net",
+        "demo": "https://dont-code.net/apps.html",
+        "admindoc": "https://dont-code.net/developers.html",
+        "userdoc": "https://dont-code.net/news.html",
+        "code": "https://github.com/dont-code"
+    },
+    "license": "free",
+    "maintainer": {
+        "name": "Gerard Collin",
+        "email": "ger@collin.best"
+    },
+    "requirements": {
+        "yunohost": ">= 11.0.0"
+    },
+    "multi_instance": false,
+    "services": [
+        "nginx",
+        "mongod"
+    ],
+    "arguments": {
+        "install": [
+            {
+                "name": "domain",
+                "type": "domain"
+            },
+            {
+                "name": "path",
+                "type": "path",
+                "example": "/dont-code",
+                "default": "/dont-code"
+            },
+            {
+                "name": "public_key",
+                "type": "string",
+                "ask": {
+                    "en": "This public_key allows you to update the services through ssh (as part of delivery process)",
+                    "fr": "Fournir ici une clef publique qui permettra de mettre à jour les services (via une deploiement automatique)"
+                }
+            },
+            {
+                "name": "is_public",
+                "type": "boolean",
+                "default": true,
+                "ask": {
+                    "en": "These services are called by the Dont-code applications, so they should stay public",
+                    "fr": "Merci de laisser ces services public afin de pouvoir être appelé par les applications Dont-code"
+                }
+            }
+        ]
+    }
+}
