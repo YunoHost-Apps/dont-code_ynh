@@ -19,23 +19,32 @@ ynh_script_progression --message="Loading installation settings..." --weight=1
 app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get --app=$app --key=domain)
-port=$(ynh_app_setting_get --app=$app --key=port)
+port_ide=$(ynh_app_setting_get --app=$app --key=port_ide)
+port_preview=$(ynh_app_setting_get --app=$app --key=port_preview)
+port_project=$(ynh_app_setting_get --app=$app --key=port_project)
+port_data=$(ynh_app_setting_get --app=$app --key=port_data)
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 db_user=$db_name
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+
+SERVICES_LIST=(ide preview project data)
+PORT_LIST=($port_ide $port_preview $port_project $port_data)
 
 #=================================================
 # STANDARD REMOVE
 #=================================================
 # REMOVE SERVICE INTEGRATION IN YUNOHOST
 #=================================================
+ynh_script_progression --message="Removing $app services..." --weight=1
 
 # Remove the service from the list of services known by YunoHost (added from `yunohost service add`)
-if ynh_exec_warn_less yunohost service status $app >/dev/null
-then
-	ynh_script_progression --message="Removing $app service integration..." --weight=1
-	yunohost service remove $app
-fi
+for service_name in "${SERVICES_LIST[@]}"
+do
+  if ynh_exec_warn_less yunohost service status "${app}-${service_name}" >/dev/null
+  then
+    yunohost service remove "${app}-${service_name}"
+  fi
+done
 
 #=================================================
 # STOP AND REMOVE SERVICE
@@ -43,7 +52,10 @@ fi
 ynh_script_progression --message="Stopping and removing the systemd service..." --weight=1
 
 # Remove the dedicated systemd config
-#ynh_remove_systemd_config
+for service_name in "${SERVICES_LIST[@]}"
+do
+  ynh_remove_systemd_config --service="${app}-${service_name}"
+done
 
 #=================================================
 # REMOVE LOGROTATE CONFIGURATION
@@ -59,7 +71,9 @@ ynh_remove_logrotate
 ynh_script_progression --message="Removing the Mongo database..." --weight=1
 
 # Remove a database if it exists, along with the associated user
-ynh_mongo_remove_db --db_user=$db_user --db_name=$db_name
+ynh_mongo_remove_db --db_user=$db_user --db_name=dontCodeProjects
+ynh_mongo_remove_db --db_user=$db_user --db_name=dontCodeDemoProjects
+ynh_mongo_remove_db --db_user=$db_user --db_name=dontCodeData
 
 # Remove mongo itself if not used anymore
 ynh_remove_mongo
@@ -89,14 +103,17 @@ ynh_script_progression --message="Removing dependencies..." --weight=1
 ynh_remove_app_dependencies
 
 #=================================================
-# CLOSE A PORT
+# CLOSE ALL PORTS
 #=================================================
 
-if yunohost firewall list | grep -q "\- $port$"
-then
-	ynh_script_progression --message="Closing port $port..." --weight=1
-	ynh_exec_warn_less yunohost firewall disallow TCP $port
-fi
+for port in "${PORT_LIST[@]}"
+do
+  if yunohost firewall list | grep -q "\- $port$"
+  then
+    ynh_script_progression --message="Closing port $port..." --weight=1
+    ynh_exec_warn_less yunohost firewall disallow TCP $port
+  fi
+done
 
 #=================================================
 # SPECIFIC REMOVE
@@ -104,9 +121,6 @@ fi
 # REMOVE VARIOUS FILES
 #=================================================
 ynh_script_progression --message="Removing various files..." --weight=1
-
-# Remove the app directory securely
-ynh_secure_remove --file="$final_path"
 
 # Remove the log files
 ynh_secure_remove --file="/var/log/$app"
