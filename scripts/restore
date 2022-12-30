@@ -8,6 +8,8 @@
 
 # Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
+source ../settings/scripts/ynh_mongo_db__2
+source ../settings/scripts/ynh_java
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -31,10 +33,9 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
-db_user=$db_name
-phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
-datadir=$(ynh_app_setting_get --app=$app --key=datadir)
+db_user=$(ynh_app_setting_get --app=$app --key=db_user)
+document_path=$(ynh_app_setting_get --app=$app --key=document_path)
+public_key=$(ynh_app_setting_get --app=$app --key=public_key)
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
@@ -69,16 +70,24 @@ ynh_restore_file --origin_path="$final_path"
 # this will be treated as a security issue.
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
-chown -R $app:www-data "$final_path"
+chown -R $app:$app "$final_path"
+
+#Make sure the .ssh and files have the correct access rights
+if [ -n "$public_key" ]
+then
+  chown -R $app:$app "$final_path/.ssh"
+  chmod 700 "$final_path/.ssh"
+  chmod 600 "$final_path/.ssh/authorized_keys"
+fi
 
 #=================================================
-# RESTORE THE DATA DIRECTORY
+# RESTORE THE DOCUMENTS DIRECTORY
 #=================================================
-ynh_script_progression --message="Restoring the data directory..." --weight=1
+ynh_script_progression --message="Restoring the document directory..." --weight=1
 
-ynh_restore_file --origin_path="$datadir" --not_mandatory
+ynh_restore_file --origin_path="$document_path" --not_mandatory
 
-mkdir -p $datadir
+mkdir -p $document_path
 
 # FIXME: this should be managed by the core in the future
 # Here, as a packager, you may have to tweak the ownerhsip/permissions
@@ -86,18 +95,9 @@ mkdir -p $datadir
 # files in some cases.
 # But FOR THE LOVE OF GOD, do not allow r/x for "others" on the entire folder -
 # this will be treated as a security issue.
-chmod 750 "$datadir"
-chmod -R o-rwx "$datadir"
-chown -R $app:www-data "$datadir"
-
-#=================================================
-# RESTORE FAIL2BAN CONFIGURATION
-#=================================================
-ynh_script_progression --message="Restoring the Fail2Ban configuration..." --weight=1
-
-ynh_restore_file --origin_path="/etc/fail2ban/jail.d/$app.conf"
-ynh_restore_file --origin_path="/etc/fail2ban/filter.d/$app.conf"
-ynh_systemd_action --action=restart --service_name=fail2ban
+chmod 750 "$document_path"
+chmod -R o-rwx "$document_path"
+chown -R $app:www-data "$document_path"
 
 #=================================================
 # SPECIFIC RESTORATION
@@ -106,15 +106,14 @@ ynh_systemd_action --action=restart --service_name=fail2ban
 #=================================================
 ynh_script_progression --message="Reinstalling dependencies..." --weight=1
 
+# Install the required version of Java
+ynh_install_java --java_version=17 --jdk_type=jre
+
 # Define and install dependencies
 ynh_install_app_dependencies $pkg_dependencies
 
-#=================================================
-# RESTORE THE PHP-FPM CONFIGURATION
-#=================================================
-ynh_script_progression --message="Restoring the PHP-FPM configuration..." --time --weight=1
-
-ynh_restore_file --origin_path="/etc/php/$phpversion/fpm/pool.d/$app.conf"
+# Install the required version of Mongo
+ynh_install_mongo --mongo_version=6.0
 
 #=================================================
 # RESTORE THE NGINX CONFIGURATION
@@ -124,30 +123,35 @@ ynh_script_progression --message="Restoring the NGINX web server configuration..
 ynh_restore_file --origin_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
-# RESTORE THE MYSQL DATABASE
+# RESTORE THE MONGO DATABASES
 #=================================================
-ynh_script_progression --message="Restoring the MySQL database..." --weight=1
+ynh_script_progression --message="Restoring the Mongo database..." --weight=1
 
-db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
-ynh_mysql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
-ynh_mysql_connect_as --user=$db_user --password=$db_pwd --database=$db_name < ./db.sql
+db_pwd=$(ynh_app_setting_get --app=$app --key=db_pwd)
+ynh_mongo_setup_db --db_user=$db_user --db_name=${MONGO_DB_LIST[0]} --db_pwd=$db_pwd
+
+for db_name in "${MONGO_DB_LIST[@]}"
+do
+  ynh_mongo_restore_db --database="$db_name" < ./dump-${db_name}.bson
+done
 
 #=================================================
 # RESTORE VARIOUS FILES
 #=================================================
 ynh_script_progression --message="Restoring various files..." --weight=1
 
-ynh_restore_file --origin_path="/etc/cron.d/$app"
-
-ynh_restore_file --origin_path="/etc/$app/"
+# ynh_restore_file --origin_path="/etc/cron.d/$app"
 
 #=================================================
 # RESTORE SYSTEMD
 #=================================================
 ynh_script_progression --message="Restoring the systemd configuration..." --weight=1
 
-ynh_restore_file --origin_path="/etc/systemd/system/$app.service"
-systemctl enable $app.service --quiet
+for service_name in "${SERVICES_LIST[@]}"
+do
+  ynh_restore_file --origin_path="/etc/systemd/system/${app}-${service_name}.service"
+  systemctl enable "${app}-${service_name}.service" --quiet
+done
 
 #=================================================
 # RESTORE THE LOGROTATE CONFIGURATION
@@ -157,27 +161,32 @@ ynh_script_progression --message="Restoring the logrotate configuration..." --we
 ynh_restore_file --origin_path="/etc/logrotate.d/$app"
 
 #=================================================
-# INTEGRATE SERVICE IN YUNOHOST
+# INTEGRATE SERVICES IN YUNOHOST
 #=================================================
-ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
+ynh_script_progression --message="Integrating services in YunoHost..." --weight=1
 
-yunohost service add $app --description="A short description of the app" --log="/var/log/$app/$app.log"
+for service_name in "${SERVICES_LIST[@]}"
+do
+  yunohost service add "${app}-${service_name}" --description="Dont-code platform ${service_name} service" --log="/var/log/${app}/${service_name}-${app}.log"
+done
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=1
+ynh_script_progression --message="Starting systemd services..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+for service_name in "${SERVICES_LIST[@]}"
+do
+  ynh_systemd_action --service_name="${app}-${service_name}" --action="start" --log_path="/var/log/$app/$app.log"
+done
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
 # RELOAD NGINX AND PHP-FPM
 #=================================================
-ynh_script_progression --message="Reloading NGINX web server and PHP-FPM..." --weight=1
+ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
-ynh_systemd_action --service_name=php$phpversion-fpm --action=reload
 ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================

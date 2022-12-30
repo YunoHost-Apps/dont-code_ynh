@@ -22,8 +22,6 @@ ynh_clean_setup () {
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
-SERVICES_LIST=(ide preview project data)
-
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
@@ -139,8 +137,6 @@ ynh_system_user_create --username=$app --home_dir="$final_path" --use_shell --gr
 #=================================================
 ynh_script_progression --message="Creating the Mongo databases..." --weight=1
 
-# No need to create the database for data and demoProjects, and the user is not used
-
 #db_project_name=$(ynh_sanitize_dbid --db_name="${app}-projects")
 #db_demo_project_name=$(ynh_sanitize_dbid --db_name="${app}-demo-projects")
 #db_data_name=$(ynh_sanitize_dbid --db_name="${app}-data")
@@ -148,10 +144,11 @@ db_user=$(ynh_sanitize_dbid --db_name="${app}")
 #ynh_app_setting_set --app=$app --key=db_project_name --value=$db_project_name
 #ynh_app_setting_set --app=$app --key=db_demo_project_name --value=$db_demo_project_name
 #ynh_app_setting_set --app=$app --key=db_data_name --value=$db_data_name
-#ynh_app_setting_set --app=$app --key=db_user --value=$db_user
+ynh_app_setting_set --app=$app --key=db_user --value=$db_user
 
 #We should probably enable databases to the user, but for now, we connect through admin
-ynh_mongo_setup_db --db_user=$db_user --db_name=dontCodeProjects
+ynh_mongo_setup_db --db_user=$db_user --db_name=${MONGO_DB_LIST[0]}
+#No need to create other databases: Mongo creates them on the fly
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -210,11 +207,15 @@ document_path=/var/www/$app/documents
 test ! -e "$document_path" || ynh_die --message="This path already contains a folder"
 mkdir --parents $document_path
 
+ynh_app_setting_set --app=$app --key=document_path --value=$document_path
+
 chmod 750 "$document_path"
 chmod -R o-rwx "$document_path"
 chown -R $app:www-data "$document_path"
 
 document_url=https://${domain}${path_url}/documents
+
+ynh_app_setting_set --app=$app --key=document_url --value=$document_url
 
 #=================================================
 # DONT CREATE A DATA DIRECTORY

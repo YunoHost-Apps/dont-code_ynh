@@ -8,6 +8,7 @@
 
 # Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
+source ../settings/scripts/ynh_mongo_db__2
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -30,9 +31,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 domain=$(ynh_app_setting_get --app=$app --key=domain)
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
-phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
-datadir=$(ynh_app_setting_get --app=$app --key=datadir)
+document_path=$(ynh_app_setting_get --app=$app --key=document_path)
 
 #=================================================
 # DECLARE DATA AND CONF FILES TO BACKUP
@@ -51,29 +50,16 @@ ynh_print_info --message="Declaring files to be backed up..."
 ynh_backup --src_path="$final_path"
 
 #=================================================
-# BACKUP THE DATA DIR
+# BACKUP THE DOCUMENT DIR
 #=================================================
 
-ynh_backup --src_path="$datadir" --is_big
+ynh_backup --src_path="$document_path" --is_big
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
 ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
-
-#=================================================
-# BACKUP THE PHP-FPM CONFIGURATION
-#=================================================
-
-ynh_backup --src_path="/etc/php/$phpversion/fpm/pool.d/$app.conf"
-
-#=================================================
-# BACKUP FAIL2BAN CONFIGURATION
-#=================================================
-
-ynh_backup --src_path="/etc/fail2ban/jail.d/$app.conf"
-ynh_backup --src_path="/etc/fail2ban/filter.d/$app.conf"
 
 #=================================================
 # SPECIFIC BACKUP
@@ -84,28 +70,29 @@ ynh_backup --src_path="/etc/fail2ban/filter.d/$app.conf"
 ynh_backup --src_path="/etc/logrotate.d/$app"
 
 #=================================================
-# BACKUP SYSTEMD
+# BACKUP SYSTEMD services
 #=================================================
 
-ynh_backup --src_path="/etc/systemd/system/$app.service"
+for service_name in "${SERVICES_LIST[@]}"
+do
+  ynh_backup --src_path="/etc/systemd/system/${app}-${service_name}.service"
+done
 
 #=================================================
 # BACKUP VARIOUS FILES
 #=================================================
 
-ynh_backup --src_path="/etc/cron.d/$app"
-
-ynh_backup --src_path="/etc/$app/"
+# ynh_backup --src_path="/etc/cron.d/$app"
 
 #=================================================
-# BACKUP THE MYSQL DATABASE
+# BACKUP THE MONGO DATABASES
 #=================================================
-ynh_print_info --message="Backing up the MySQL database..."
+ynh_print_info --message="Backing up the Mongo databases..."
 
-### (However, things like MySQL dumps *do* take some time to run, though the
-### copy of the generated dump to the archive still happens later)
-
-ynh_mysql_dump_db --database="$db_name" > db.sql
+for db_name in "${MONGO_DB_LIST[@]}"
+do
+  ynh_mongo_dump_db --database=$db_name > ./dump-${db_name}.bson
+done
 
 #=================================================
 # END OF SCRIPT
