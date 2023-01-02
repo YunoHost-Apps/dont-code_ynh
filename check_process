@@ -7,27 +7,24 @@
 	; Manifest
 		domain="domain.tld"
 		path="/path"
+		public_key="dummy public key"
 		is_public=1
-		language="fr"
-		admin="john"
-		password="1Strong-Password"
-		port="666"
 	; Checks
 		pkg_linter=1
 		setup_sub_dir=1
 		setup_root=1
 		setup_nourl=0
-		setup_private=1
+		setup_private=0
 		setup_public=1
 		upgrade=1
-		upgrade=1	from_commit=CommitHash
+		upgrade=0	from_commit=CommitHash
 		backup_restore=1
-		multi_instance=1
-		port_already_use=0
+		multi_instance=0
+		port_already_use=1 (8084)
 		change_url=1
 ;;; Options
-Email=
-Notification=none
+Email=ger@shared.collin.best
+Notification=Down
 ;;; Upgrade options
 	; commit=CommitHash
 		name=Name and date of the commit.
