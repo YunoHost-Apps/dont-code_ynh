@@ -109,7 +109,7 @@ PORT_LIST=($port_ide $port_preview $port_project $port_data)
 ynh_script_progression --message="Installing dependencies..." --weight=1
 
 # Install the required version of Java
-ynh_install_java --java_version=17 --jdk_type=jre
+ynh_install_java --java_version=$java_version --jdk_type=jre
 
 ### `ynh_install_app_dependencies` allows you to add any "apt" dependencies to the package.
 ### Those deb packages will be installed as dependencies of this package.
@@ -122,7 +122,7 @@ ynh_install_java --java_version=17 --jdk_type=jre
 ynh_install_app_dependencies $pkg_dependencies
 
 # Install the required version of Mongo
-ynh_install_mongo --mongo_version=6.0
+ynh_install_mongo --mongo_version=$mongo_version
 
 #=================================================
 # CREATE DEDICATED USER
@@ -203,7 +203,7 @@ ynh_add_nginx_config
 #=================================================
 # Create document storage
 #=================================================
-document_path=/var/www/$app/documents
+document_path=/usr/share/nginx/html/$app/docs
 test ! -e "$document_path" || ynh_die --message="This path already contains a folder"
 mkdir --parents $document_path
 
@@ -213,7 +213,7 @@ chmod 750 "$document_path"
 chmod -R o-rwx "$document_path"
 chown -R $app:www-data "$document_path"
 
-document_url=https://${domain}${path_url}/documents
+document_url=https://${domain}${path_url}/docs
 
 ynh_app_setting_set --app=$app --key=document_url --value=$document_url
 

@@ -1,12 +1,8 @@
-* Any known limitations, constrains or stuff not working, such as (but not limited to):
-    * requiring a full dedicated domain ?
-    * architectures not supported ?
-    * not-working single-sign on or LDAP integration ?
-    * the app requires an important amount of RAM / disk / .. to install or to work properly
+* This application is installing services and mongo databases on top of Yunohost services
+    * They are not integrated with yunohost sso or LDAP: Any client application can call the installed services
     * etc...
 
-* Other infos that people should be aware of, such as:
-    * any specific step to perform after installing (such as manually finishing the install, specific admin credentials, ...)
-    * how to configure / administrate the application if it ain't obvious
-    * upgrade process / specificities / things to be aware of ?
-    * security considerations ?
+* After installation of these services
+    * You must change the configuration of the Builder and Previewer to point to these services.
+    * You can update the services themselves by configuring a proper ssh public key when installing the app. You'll then be able to upload the .jar files
+

@@ -30,9 +30,12 @@ ynh_script_progression --message="Loading installation settings..." --weight=1
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 
 # Add settings here as needed by your application
-#db_name=$(ynh_app_setting_get --app=$app --key=db_name)
-#db_user=$db_name
-#db_pwd=$(ynh_app_setting_get --app=$app --key=db_pwd)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+port_ide=$(ynh_app_setting_get --app=$app --key=port_ide)
+port_preview=$(ynh_app_setting_get --app=$app --key=port_preview)
+port_project=$(ynh_app_setting_get --app=$app --key=port_project)
+port_data=$(ynh_app_setting_get --app=$app --key=port_data)
+document_path=$(ynh_app_setting_get --app=$app --key=document_path)
 
 #=================================================
 # BACKUP BEFORE CHANGE URL THEN ACTIVE TRAP
@@ -72,9 +75,12 @@ fi
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Stopping a systemd service..." --weight=1
+ynh_script_progression --message="Stopping systemd services..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+for service_name in "${SERVICES_LIST[@]}"
+do
+    ynh_systemd_action --service_name="${app}-${service_name}" --action="stop" --log_path="/var/log/$app/$app.log"
+done
 
 #=================================================
 # MODIFY URL IN NGINX CONF
@@ -108,17 +114,29 @@ fi
 #=================================================
 # SPECIFIC MODIFICATIONS
 #=================================================
-# ...
+# Update document url in .env
 #=================================================
+ynh_script_progression --message="Updating .env configuration..."
+
+document_url=https://${new_domain}${new_path}/documents
+old_document_url=https://${old_domain}${old_path}/documents
+ynh_app_setting_set --app=$app --key=document_url --value=$document_url
+
+ynh_backup_if_checksum_is_different --file="$final_path/.env"
+ynh_replace_string --match_string="$old_document_url" --replace_string="$document_url" --target_file="$final_path/.env"
+ynh_store_file_checksum --file="$final_path/.env"
 
 #=================================================
 # GENERIC FINALISATION
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=1
+ynh_script_progression --message="Starting systemd services..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+for service_name in "${SERVICES_LIST[@]}"
+do
+  ynh_systemd_action --service_name="${app}-${service_name}" --action="start" --log_path="/var/log/$app/$app.log"
+done
 
 #=================================================
 # RELOAD NGINX

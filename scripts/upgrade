@@ -7,6 +7,8 @@
 #=================================================
 
 source _common.sh
+source ynh_mongo_db__2
+source ynh_java
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -18,10 +20,15 @@ app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
-language=$(ynh_app_setting_get --app=$app --key=language)
-admin=$(ynh_app_setting_get --app=$app --key=admin)
+port_ide=$(ynh_app_setting_get --app=$app --key=port_ide)
+port_preview=$(ynh_app_setting_get --app=$app --key=port_preview)
+port_project=$(ynh_app_setting_get --app=$app --key=port_project)
+port_data=$(ynh_app_setting_get --app=$app --key=port_data)
+db_user=$(ynh_app_setting_get --app=$app --key=db_user)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+document_path=$(ynh_app_setting_get --app=$app --key=document_path)
+
+PORT_LIST=($port_ide $port_preview $port_project $port_data)
 
 #=================================================
 # CHECK VERSION
@@ -52,54 +59,20 @@ ynh_abort_if_errors
 #=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
-# STOP SYSTEMD SERVICE
+# STOP SYSTEMD SERVICES
 #=================================================
-ynh_script_progression --message="Stopping a systemd service..." --weight=1
+ynh_script_progression --message="Stopping systemd services..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+for service_name in "${SERVICES_LIST[@]}"
+do
+    ynh_systemd_action --service_name="${app}-${service_name}" --action="stop" --log_path="/var/log/$app/$app.log"
+done
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
-
-#
-# N.B. : the followings setting migrations snippets are provided as *EXAMPLES*
-# of what you may want to do in some cases (e.g. a setting was not defined on
-# some legacy installs and you therefore want to initiaze stuff during upgrade)
-#
-
-# If db_name doesn't exist, create it
-#if [ -z "$db_name" ]; then
-#	db_name=$(ynh_sanitize_dbid --db_name=$app)
-#	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-#fi
-
-# If final_path doesn't exist, create it
-#if [ -z "$final_path" ]; then
-#	final_path=/var/www/$app
-#	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
-#fi
-
-### If nobody installed your app before 4.1,
-### then you may safely remove these lines
-
-# Cleaning legacy permissions
-if ynh_legacy_permissions_exists; then
-	ynh_legacy_permissions_delete_all
-
-	ynh_app_setting_delete --app=$app --key=is_public
-fi
-
-if ! ynh_permission_exists --permission="admin"; then
-	# Create the required permissions
-	ynh_permission_create --permission="admin" --url="/admin" --allowed=$admin
-fi
-
-# Create a permission if needed
-if ! ynh_permission_exists --permission="api"; then
-	ynh_permission_create --permission="api" --url="/api" --allowed="visitors" --show_tile="false" --protected="true"
-fi
+# ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+# Nothing to do for now
 
 #=================================================
 # CREATE DEDICATED USER
@@ -107,7 +80,7 @@ fi
 ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 
 # Create a dedicated user (if not existing)
-ynh_system_user_create --username=$app --home_dir="$final_path"
+ynh_system_user_create --username=$app --home_dir="$final_path" --use_shell --groups="ssh.app"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -119,6 +92,8 @@ then
 
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$final_path"
+
+	# No need to upgrade the .ssh authorization files
 fi
 
 # FIXME: this should be managed by the core in the future
@@ -129,22 +104,20 @@ fi
 # this will be treated as a security issue.
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
-chown -R $app:www-data "$final_path"
+chown -R $app:$app "$final_path"
 
 #=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
 ynh_script_progression --message="Upgrading dependencies..." --weight=1
 
+# Install the required version of Java
+ynh_install_java --java_version=$java_version --jdk_type=jre
+
 ynh_install_app_dependencies $pkg_dependencies
 
-#=================================================
-# PHP-FPM CONFIGURATION
-#=================================================
-ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=1
-
-# Create a dedicated PHP-FPM config
-ynh_add_fpm_config
+# Install the required version of Mongo
+ynh_install_mongo --mongo_version=$mongo_version
 
 #=================================================
 # NGINX CONFIGURATION
@@ -157,26 +130,58 @@ ynh_add_nginx_config
 #=================================================
 # SPECIFIC UPGRADE
 #=================================================
-# ...
+# Create document storage
 #=================================================
+# The document path has changed => Copy all the files
+
+if [ "$document_path" != "/usr/share/nginx/html/$app/docs" ]; then
+  ynh_script_progression --message="Moving the document path to its new dir" --time --weight=1
+
+  old_doc_path=$document_path
+  document_path=/usr/share/nginx/html/$app/docs
+  test ! -e "$document_path" || ynh_die --message="This path already contains a folder"
+  mkdir --parents $document_path
+
+  mv $old_doc_path/* $document_path/*
+
+  ynh_secure_remove --file=$old_doc_path
+  ynh_app_setting_set --app=$app --key=document_path --value=$document_path
+
+  chmod 750 "$document_path"
+  chmod -R o-rwx "$document_path"
+  chown -R $app:www-data "$document_path"
+
+  # Update the path in .env file
+  ynh_backup_if_checksum_is_different --file="$final_path/.env"
+  ynh_replace_string --match_string="$old_old_doc_path" --replace_string="$document_document_path" --target_file="$final_path/.env"
+
+  # Changed the document url as well
+  old_document_url=$document_url
+  document_url=https://${domain}${path_url}/docs
+  ynh_app_setting_set --app=$app --key=document_url --value=$document_url
+
+  ynh_replace_string --match_string="$old_document_url" --replace_string="$document_url" --target_file="$final_path/.env"
+  ynh_store_file_checksum --file="$final_path/.env"
+
+fi
 
 #=================================================
 # UPDATE A CONFIG FILE
 #=================================================
-ynh_script_progression --message="Updating a configuration file..." --weight=1
+# ynh_script_progression --message="Updating a configuration file..." --weight=1
 
 ### Same as during install
 ###
 ### The file will automatically be backed-up if it's found to be manually modified (because
 ### ynh_add_config keeps track of the file's checksum)
 
-ynh_add_config --template="some_config_file" --destination="$final_path/some_config_file"
+# ynh_add_config --template="some_config_file" --destination="$final_path/some_config_file"
 
 # FIXME: this should be handled by the core in the future
 # You may need to use chmod 600 instead of 400,
 # for example if the app is expected to be able to modify its own config
-chmod 400 "$final_path/some_config_file"
-chown $app:$app "$final_path/some_config_file"
+# chmod 400 "$final_path/some_config_file"
+# chown $app:$app "$final_path/some_config_file"
 
 ### For more complex cases where you want to replace stuff using regexes,
 ### you shoud rely on ynh_replace_string (which is basically a wrapper for sed)
@@ -190,8 +195,15 @@ chown $app:$app "$final_path/some_config_file"
 #=================================================
 ynh_script_progression --message="Upgrading systemd configuration..." --weight=1
 
-# Create a dedicated systemd config
-ynh_add_systemd_config
+# Create a dedicated systemd config for each service
+
+service_list_length=${#SERVICES_LIST[@]}
+for (( j=0; j<${service_list_length}; j++ ))
+do
+  service_name=${SERVICES_LIST[$j]}
+  port=${PORT_LIST[$j]}
+  ynh_add_systemd_config --service="${app}-${service_name}"
+done
 
 #=================================================
 # GENERIC FINALIZATION
@@ -208,22 +220,20 @@ ynh_use_logrotate --non-append
 #=================================================
 ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
 
-yunohost service add $app --description="A short description of the app" --log="/var/log/$app/$app.log"
+for service_name in "${SERVICES_LIST[@]}"
+do
+  yunohost service add "${app}-${service_name}" --description="Dont-code platform ${service_name} service" --log="/var/log/${app}/${service_name}-${app}.log"
+done
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=1
+ynh_script_progression --message="Starting systemd services..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
-
-#=================================================
-# UPGRADE FAIL2BAN
-#=================================================
-ynh_script_progression --message="Reconfiguring Fail2Ban..." --weight=1
-
-# Create a dedicated Fail2Ban config
-ynh_add_fail2ban_config --logpath="/var/log/nginx/${domain}-error.log" --failregex="Regex to match into the log for a failed login"
+for service_name in "${SERVICES_LIST[@]}"
+do
+  ynh_systemd_action --service_name="${app}-${service_name}" --action="start" --log_path="/var/log/$app/$app.log"
+done
 
 #=================================================
 # RELOAD NGINX

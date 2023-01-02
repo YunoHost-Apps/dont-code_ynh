@@ -5,6 +5,8 @@
 #=================================================
 java_version=17
 
+mongo_version=6.0
+
 # Java dependencies used by the app will be installed through the Java helper
 pkg_dependencies=""
 
@@ -12,7 +14,7 @@ pkg_dependencies=""
 SERVICES_LIST=(ide preview project data)
 
 # List of Mongo databases to manage
-MONGO_DB_LIST=(dontCodeProjects dontCodeDemoProjects dontCodeData)
+MONGO_DB_LIST=(dontCodeProjects dontCodeDemoProjects dontCodeData dontCodeTestProjects)
 
 #=================================================
 # PERSONAL HELPERS
