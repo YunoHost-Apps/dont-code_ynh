@@ -31,6 +31,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 domain=$(ynh_app_setting_get --app=$app --key=domain)
+html_path=$(ynh_app_setting_get --app=$app --key=html_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
 
 #=================================================
@@ -50,10 +51,10 @@ ynh_print_info --message="Declaring files to be backed up..."
 ynh_backup --src_path="$final_path"
 
 #=================================================
-# BACKUP THE DOCUMENT DIR
+# BACKUP THE HTML AND DOCUMENT DIR
 #=================================================
 
-ynh_backup --src_path="$document_path" --is_big
+ynh_backup --src_path="$html_path" --is_big
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION

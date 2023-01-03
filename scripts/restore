@@ -34,6 +34,7 @@ domain=$(ynh_app_setting_get --app=$app --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 db_user=$(ynh_app_setting_get --app=$app --key=db_user)
+html_path=$(ynh_app_setting_get --app=$app --key=html_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
 public_key=$(ynh_app_setting_get --app=$app --key=public_key)
 
@@ -83,9 +84,9 @@ fi
 #=================================================
 # RESTORE THE DOCUMENTS DIRECTORY
 #=================================================
-ynh_script_progression --message="Restoring the document directory..." --weight=1
+ynh_script_progression --message="Restoring the html directory..." --weight=1
 
-ynh_restore_file --origin_path="$document_path" --not_mandatory
+ynh_restore_file --origin_path="$html_path" --not_mandatory
 
 mkdir -p $document_path
 
@@ -95,9 +96,9 @@ mkdir -p $document_path
 # files in some cases.
 # But FOR THE LOVE OF GOD, do not allow r/x for "others" on the entire folder -
 # this will be treated as a security issue.
-chmod 750 "$document_path"
-chmod -R o-rwx "$document_path"
-chown -R $app:www-data "$document_path"
+chmod 750 "$html_path"
+chmod -R o-rwx "$html_path"
+chown -R $app:www-data "$html_path"
 
 #=================================================
 # SPECIFIC RESTORATION
@@ -125,7 +126,7 @@ ynh_restore_file --origin_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 #=================================================
 # RESTORE THE MONGO DATABASES
 #=================================================
-ynh_script_progression --message="Restoring the Mongo database..." --weight=1
+ynh_script_progression --message="Restoring the Mongo databases..." --weight=1
 
 db_pwd=$(ynh_app_setting_get --app=$app --key=db_pwd)
 ynh_mongo_setup_db --db_user=$db_user --db_name=${MONGO_DB_LIST[0]} --db_pwd=$db_pwd

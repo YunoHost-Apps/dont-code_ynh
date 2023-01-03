@@ -57,7 +57,9 @@ ynh_script_progression --message="Validating installation parameters..." --weigh
 ### The execution time is given for the duration since the previous call. So the weight should be applied to this previous call.
 
 final_path=/opt/yunohost/$app
+html_path=/usr/share/nginx/html/$app
 test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
+test ! -e "$html_path" || ynh_die --message="This path already contains a html folder"
 
 # Register (book) web path
 ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
@@ -203,15 +205,19 @@ ynh_add_nginx_config
 #=================================================
 # Create document storage
 #=================================================
-document_path=/usr/share/nginx/html/$app/docs
+document_path=$html_path/docs
 test ! -e "$document_path" || ynh_die --message="This path already contains a folder"
 mkdir --parents $document_path
 
+ynh_app_setting_set --app=$app --key=html_path --value=$html_path
 ynh_app_setting_set --app=$app --key=document_path --value=$document_path
 
-chmod 750 "$document_path"
-chmod -R o-rwx "$document_path"
-chown -R $app:www-data "$document_path"
+# Add the status page
+ynh_add_config --template="index.html" --destination="$html_path/index.html"
+
+chmod 750 "$html_path"
+chmod -R o-rwx "$html_path"
+chown -R $app:www-data "$html_path"
 
 document_url=https://${domain}${path_url}/docs
 

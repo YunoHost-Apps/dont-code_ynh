@@ -35,6 +35,7 @@ port_ide=$(ynh_app_setting_get --app=$app --key=port_ide)
 port_preview=$(ynh_app_setting_get --app=$app --key=port_preview)
 port_project=$(ynh_app_setting_get --app=$app --key=port_project)
 port_data=$(ynh_app_setting_get --app=$app --key=port_data)
+html_path=$(ynh_app_setting_get --app=$app --key=html_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
 
 #=================================================

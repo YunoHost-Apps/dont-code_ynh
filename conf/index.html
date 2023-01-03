@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dont-code services</title>
+    <style>
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 0.5rem;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            font-size: 2rem
+        }
+
+        h3 {
+            font-size: 1.75rem
+        }
+
+        h4 {
+            font-size: 1.5rem
+        }
+
+        h5 {
+            font-size: 1.25rem
+        }
+
+        h6 {
+            font-size: 1rem
+        }
+
+        .lead {
+            font-weight: 300;
+            font-size: 2rem;
+        }
+
+        .banner {
+            font-size: 2.7rem;
+            margin: 0;
+            padding: 2rem 1rem;
+            background-color: #00A1E2;
+            color: white;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        code {
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 87.5%;
+            color: #e83e8c;
+            word-break: break-word;
+        }
+
+        .api-ok {
+            color: green;
+        }
+
+        .api-nok {
+            color: red;
+        }
+
+        .left-column {
+            padding: .75rem;
+            max-width: 75%;
+            min-width: 55%;
+        }
+
+        .right-column {
+            padding: .75rem;
+            max-width: 25%;
+        }
+
+        .container {
+            width: 100%;
+            padding-left: 1rem;
+        }
+
+        li {
+            margin: 0.75rem;
+        }
+
+        .right-section {
+            margin-left: 1rem;
+            padding-left: 0.5rem;
+        }
+
+        .right-section h3 {
+            padding-top: 0;
+            font-weight: 200;
+        }
+
+        .right-section ul {
+            border-left: 0.3rem solid #00A1E2;
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+  /**
+   * Check if a relative ui is responding 200 or any other error
+    * @param uri
+   */
+  function checkUri (uri, elementId) {
+    const req = new XMLHttpRequest();
+    req.addEventListener("load",ev => {
+      const elt=document.getElementById(elementId);
+      if ((ev.target.status<200) || (ev.target.status >= 300)) {
+        elt.innerText="Error "+ev.target.status;
+        elt.classList='api-nok';
+      }else {
+          elt.innerText="OK";
+          elt.classList='api-ok';
+      }
+    });
+    req.addEventListener("error",ev => {
+      const elt=document.getElementById(elementId);
+      elt.innerText="Failed";
+      elt.classList='api-nok';
+    });
+    req.open("GET", uri);
+    req.send();
+    }
+
+  window.onload = function() {
+    checkUri('preview/sessions', 'Preview');
+    // checkUri('ide/', 'Builder');
+    checkUri('project', 'Project');
+    checkUri('data/test', 'Data');
+  };
+
+</script>
+
+<div class="banner lead">
+    Dont-code services status page
+</div>
+
+<div class="container">
+    <p class="lead">Congratulations, your Dont-code services have been installed.</p>
+
+    <div>
+        <h2>Status of each service:</h2>
+
+        <ul>
+            <li>Preview service : <span id="Preview">Checking...</span></li>
+            <li>Builder service : <span id="Builder">Cannot be checked for now.</span></li>
+            <li>Project service : <span id="Project">Checking...</span></li>
+            <li>Data service : <span id="Data">Checking...</span></li>
+        </ul>
+    </div>
+
+</div>
+
+
+</body>
+</html>

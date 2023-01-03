@@ -27,6 +27,7 @@ port_data=$(ynh_app_setting_get --app=$app --key=port_data)
 db_user=$(ynh_app_setting_get --app=$app --key=db_user)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
+html_path=$(ynh_app_setting_get --app=$app --key=html_path)
 
 PORT_LIST=($port_ide $port_preview $port_project $port_data)
 
@@ -71,8 +72,18 @@ done
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-# ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
-# Nothing to do for now
+
+# Create html_path if needed
+if [ -z "$html_path" ]; then
+  ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+  html_path=/usr/share/nginx/html/$app
+  ynh_app_setting_set --app=$app --key=html_path --value=$html_path
+  mkdir --parents $html_path
+
+  chmod 750 "$html_path"
+  chmod -R o-rwx "$html_path"
+  chown -R $app:www-data "$html_path"
+fi
 
 #=================================================
 # CREATE DEDICATED USER
@@ -123,6 +134,14 @@ ynh_install_mongo --mongo_version=$mongo_version
 # NGINX CONFIGURATION
 #=================================================
 ynh_script_progression --message="Upgrading NGINX web server configuration..." --time --weight=1
+
+# Do we need to upgrade the status index ? Do it now as html_path variable is needed for nginx file
+
+# Always Upgrade the status page
+ynh_add_config --template="index.html" --destination="$html_path/index.html"
+chmod 750 "$html_path/index.html"
+chmod o-rwx "$html_path/index.html"
+chown $app:www-data "$html_path/index.html"
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config

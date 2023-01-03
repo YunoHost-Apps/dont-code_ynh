@@ -25,6 +25,7 @@ port_project=$(ynh_app_setting_get --app=$app --key=port_project)
 port_data=$(ynh_app_setting_get --app=$app --key=port_data)
 db_user=$(ynh_app_setting_get --app=$app --key=db_user)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+html_path=$(ynh_app_setting_get --app=$app --key=html_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
 
 PORT_LIST=($port_ide $port_preview $port_project $port_data)
@@ -67,7 +68,7 @@ ynh_remove_logrotate
 #=================================================
 # REMOVE THE MONGO DATABASE
 #=================================================
-ynh_script_progression --message="Removing the Mongo database..." --weight=1
+ynh_script_progression --message="Removing the Mongo databases..." --weight=1
 
 # Remove a database if it exists, along with the associated user
 for db_name in "${MONGO_DB_LIST[@]}"
@@ -88,10 +89,10 @@ ynh_secure_remove --file="$final_path"
 #=================================================
 # REMOVE DOCUMENT DIR
 #=================================================
-ynh_script_progression --message="Removing document directory..." --weight=1
+ynh_script_progression --message="Removing html directory..." --weight=1
 
 # Remove the app directory securely
-ynh_secure_remove --file="$document_path"
+ynh_secure_remove --file="$html_path"
 
 #=================================================
 # REMOVE NGINX CONFIGURATION
