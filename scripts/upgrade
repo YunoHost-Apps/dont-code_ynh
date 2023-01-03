@@ -133,7 +133,7 @@ ynh_install_mongo --mongo_version=$mongo_version
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Upgrading NGINX web server configuration..." --time --weight=1
+ynh_script_progression --message="Upgrading NGINX web server configuration..." --weight=1
 
 # Do we need to upgrade the status index ? Do it now as html_path variable is needed for nginx file
 
