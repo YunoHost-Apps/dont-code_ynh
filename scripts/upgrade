@@ -154,7 +154,7 @@ ynh_add_nginx_config
 # The document path has changed => Copy all the files
 
 if [ "$document_path" != "/usr/share/nginx/html/$app/docs" ]; then
-  ynh_script_progression --message="Moving the document path to its new dir" --time --weight=1
+  ynh_script_progression --message="Moving the document path to its new dir" --weight=8
 
   old_doc_path=$document_path
   document_path=/usr/share/nginx/html/$app/docs

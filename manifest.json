@@ -9,17 +9,17 @@
     "version": "0.2~ynh1",
     "url": "https://dont-code.net",
     "upstream": {
-        "license": "free",
+        "license": "AGPL-3.0-or-later",
         "website": "https://dont-code.net",
         "demo": "https://dont-code.net/apps.html",
         "admindoc": "https://dont-code.net/developers.html",
         "userdoc": "https://dont-code.net/news.html",
         "code": "https://github.com/dont-code"
     },
-    "license": "free",
+    "license": "AGPL-3.0-or-later",
     "maintainer": {
-        "name": "Gerard Collin",
-        "email": "ger@collin.best"
+        "name": "Dont-code Team",
+        "email": "developer@dont-code.net"
     },
     "requirements": {
         "yunohost": ">= 11.0.0"
@@ -44,7 +44,7 @@
             {
                 "name": "public_key",
                 "type": "string",
-                "optional": "true",
+                "optional": true,
                 "ask": {
                     "en": "SSH Public key to allow service updates as part of delivery process, leave empty to disable.",
                     "fr": "Clef publique SSH permettant la mise à jour des services via une deploiement automatique, inactif si non renseigné."
@@ -53,11 +53,7 @@
             {
                 "name": "is_public",
                 "type": "boolean",
-                "default": true,
-                "ask": {
-                    "en": "These services are called by the Dont-code applications, so they should stay public",
-                    "fr": "Merci de laisser ces services public afin de pouvoir être appelé par les applications Dont-code"
-                }
+                "default": true
             }
         ]
     }
