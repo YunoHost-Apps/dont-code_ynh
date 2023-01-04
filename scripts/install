@@ -219,7 +219,7 @@ chmod 750 "$html_path"
 chmod -R o-rwx "$html_path"
 chown -R $app:www-data "$html_path"
 
-document_url=https://${domain}${path_url}/docs
+document_url=$(append_uri "https://${domain}${path_url}" "docs")
 
 ynh_app_setting_set --app=$app --key=document_url --value=$document_url
 

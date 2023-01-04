@@ -37,6 +37,7 @@ port_project=$(ynh_app_setting_get --app=$app --key=port_project)
 port_data=$(ynh_app_setting_get --app=$app --key=port_data)
 html_path=$(ynh_app_setting_get --app=$app --key=html_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
+document_url=$(ynh_app_setting_get --app=$app --key=document_url)
 
 #=================================================
 # BACKUP BEFORE CHANGE URL THEN ACTIVE TRAP
@@ -119,13 +120,13 @@ fi
 #=================================================
 ynh_script_progression --message="Updating .env configuration..."
 
-document_url=https://${new_domain}${new_path}/documents
-old_document_url=https://${old_domain}${old_path}/documents
-ynh_app_setting_set --app=$app --key=document_url --value=$document_url
+new_document_url=$(append_uri "https://${new_domain}${new_path}" "docs")
+ynh_app_setting_set --app=$app --key=document_url --value=$new_document_url
 
 ynh_backup_if_checksum_is_different --file="$final_path/.env"
-ynh_replace_string --match_string="$old_document_url" --replace_string="$document_url" --target_file="$final_path/.env"
+ynh_replace_string --match_string="$document_url" --replace_string="$new_document_url" --target_file="$final_path/.env"
 ynh_store_file_checksum --file="$final_path/.env"
+document_url=new_document_url
 
 #=================================================
 # GENERIC FINALISATION

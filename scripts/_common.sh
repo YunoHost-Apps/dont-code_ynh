@@ -19,6 +19,15 @@ MONGO_DB_LIST=(dontCodeProjects dontCodeDemoProjects dontCodeData dontCodeTestPr
 #=================================================
 # PERSONAL HELPERS
 #=================================================
+append_uri() {
+  local return="";
+  if [[ $1 == */ ]]; then
+    return=$1$2;
+  else
+    return=$1/$2
+  fi
+  echo "$return";
+}
 
 #=================================================
 # EXPERIMENTAL HELPERS

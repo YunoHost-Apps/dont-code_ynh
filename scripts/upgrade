@@ -27,6 +27,7 @@ port_data=$(ynh_app_setting_get --app=$app --key=port_data)
 db_user=$(ynh_app_setting_get --app=$app --key=db_user)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
+document_url=$(ynh_app_setting_get --app=$app --key=document_url)
 html_path=$(ynh_app_setting_get --app=$app --key=html_path)
 
 PORT_LIST=($port_ide $port_preview $port_project $port_data)
@@ -172,16 +173,26 @@ if [ "$document_path" != "/usr/share/nginx/html/$app/docs" ]; then
 
   # Update the path in .env file
   ynh_backup_if_checksum_is_different --file="$final_path/.env"
-  ynh_replace_string --match_string="$old_old_doc_path" --replace_string="$document_document_path" --target_file="$final_path/.env"
-
-  # Changed the document url as well
-  old_document_url=$document_url
-  document_url=https://${domain}${path_url}/docs
-  ynh_app_setting_set --app=$app --key=document_url --value=$document_url
-
-  ynh_replace_string --match_string="$old_document_url" --replace_string="$document_url" --target_file="$final_path/.env"
+  ynh_replace_string --match_string="$old_doc_path" --replace_string="$document_path" --target_file="$final_path/.env"
   ynh_store_file_checksum --file="$final_path/.env"
 
+fi
+
+# Regenerate the .env file if the document_url was incorrectly set before
+correct_document_url=$(append_uri "https://${domain}${path_url}" "docs")
+if [ "$correct_document_url" != "$document_url" ]; then
+  ynh_script_progression --message="Updading url for documents" --weight=1
+  old_doc_url=$document_url
+  document_url=$correct_document_url
+  ynh_app_setting_set --app=$app --key=document_url --value=$document_url
+
+  ynh_add_config --template=".env" --destination="$final_path/.env"
+
+  # FIXME: this should be handled by the core in the future
+  # You may need to use chmod 600 instead of 400,
+  # for example if the app is expected to be able to modify its own config
+  chmod 400 "$final_path/.env"
+  chown $app:$app "$final_path/.env"
 fi
 
 #=================================================
