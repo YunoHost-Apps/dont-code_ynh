@@ -29,6 +29,7 @@ final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
 document_url=$(ynh_app_setting_get --app=$app --key=document_url)
 html_path=$(ynh_app_setting_get --app=$app --key=html_path)
+public_key=$(ynh_app_setting_get --app=$app --key=public_key)
 
 PORT_LIST=($port_ide $port_preview $port_project $port_data)
 
@@ -105,7 +106,6 @@ then
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$final_path"
 
-	# No need to upgrade the .ssh authorization files
 fi
 
 # FIXME: this should be managed by the core in the future
@@ -193,6 +193,22 @@ if [ "$correct_document_url" != "$document_url" ]; then
   # for example if the app is expected to be able to modify its own config
   chmod 400 "$final_path/.env"
   chown $app:$app "$final_path/.env"
+fi
+
+if [ -n "$public_key" ] && [ ! -f "$final_path/restart-services.sh" ];
+then
+  ynh_script_progression --message="Upgrading ssh access for dev..." --weight=1
+
+ # Enable restarting of services from ssh
+  ynh_add_config --template="restart-services.sh" --destination="$final_path/restart-services.sh"
+
+  # Enable root ownership to be able to call systemctl
+  chown $app:$app "$final_path/restart-services.sh"
+  chmod o-rwx,gu=rwx "$final_path/restart-services.sh"
+
+  ynh_add_config --template="dont-code-sudoers" --destination="/etc/sudoers.d/$app-sudoers"
+  chown root:root "/etc/sudoers.d/$app-sudoers"
+  chmod o-rwx,gu=r "/etc/sudoers.d/$app-sudoers"
 fi
 
 #=================================================

@@ -179,6 +179,7 @@ ynh_setup_source --dest_dir="$final_path"
 
 if [ -n "$public_key" ]
 then
+  ynh_script_progression --message="Enabling ssh access for dev..." --weight=1
   #enable ssh access to the files for updates
   #todo: Secure it more with https://github.com/YunoHost-Apps/ssh_chroot_dir_ynh
   mkdir --parents $final_path/.ssh
@@ -187,6 +188,22 @@ then
   chown -R $app:$app "$final_path/.ssh"
   chmod 700 "$final_path/.ssh"
   chmod 600 "$final_path/.ssh/authorized_keys"
+
+  #=================================================
+  # Create restart services file
+  #=================================================
+
+  # Enable restarting of services from ssh
+  ynh_add_config --template="restart-services.sh" --destination="$final_path/restart-services.sh"
+
+  # Enable root ownership to be able to call systemctl
+  chown $app:$app "$final_path/restart-services.sh"
+  chmod o-rwx,gu=rwx "$final_path/restart-services.sh"
+
+  ynh_add_config --template="dont-code-sudoers" --destination="/etc/sudoers.d/$app-sudoers"
+  chown root:root "/etc/sudoers.d/$app-sudoers"
+  chmod o-rwx,gu=r "/etc/sudoers.d/$app-sudoers"
+
 fi
 
 
@@ -205,6 +222,7 @@ ynh_add_nginx_config
 #=================================================
 # Create document storage
 #=================================================
+ynh_script_progression --message="Configuring document storage..." --weight=1
 document_path=$html_path/docs
 test ! -e "$document_path" || ynh_die --message="This path already contains a folder"
 mkdir --parents $document_path
