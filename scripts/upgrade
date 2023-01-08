@@ -128,6 +128,8 @@ ynh_install_java --java_version=$java_version --jdk_type=jre
 
 ynh_install_app_dependencies $pkg_dependencies
 
+ynh_print_info --message="Debian release is $(ynh_get_debian_release)"
+
 # Install the required version of Mongo
 ynh_install_mongo --mongo_version=$mongo_version
 
