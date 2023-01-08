@@ -20,6 +20,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
+is_public=$(ynh_app_setting_get --app=$app --key=is_public)
 port_ide=$(ynh_app_setting_get --app=$app --key=port_ide)
 port_preview=$(ynh_app_setting_get --app=$app --key=port_preview)
 port_project=$(ynh_app_setting_get --app=$app --key=port_project)
@@ -74,6 +75,12 @@ done
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
+
+# Check or set the value of is_public
+if [ -e "$is_public" ]; then
+  is_public=true
+  ynh_app_setting_set --app=$app --key=is_public --value=$is_public
+fi
 
 # Create html_path if needed
 if [ -z "$html_path" ]; then
