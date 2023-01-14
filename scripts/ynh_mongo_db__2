@@ -321,7 +321,7 @@ ynh_install_mongo() {
 	systemctl daemon-reload --quiet
 
 	# Test mongod to see if it crashes
-	ynh_exec_err /usr/bin/mongod --config /etc/mongodb.conf
+	ynh_exec_err "/usr/bin/mongod --config /etc/mongodb.conf"
 	sleep 60
 	pkill mongod
 	ynh_exec_err cat /var/log/mongodb/mongod.conf
