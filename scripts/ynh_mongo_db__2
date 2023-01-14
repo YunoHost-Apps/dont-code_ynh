@@ -321,10 +321,11 @@ ynh_install_mongo() {
 #	systemctl daemon-reload --quiet
 
 	# Test mongod to see if it crashes
-	ynh_exec_err /usr/bin/mongod --config /etc/mongodb.conf
-	# sleep 60
+	ynh_exec_err /usr/bin/mongod --help
+	ynh_exec_err /usr/bin/mongosh --help
+  	# sleep 60
 	# pkill mongod
-	# ynh_exec_err cat /var/log/mongodb/mongod.conf
+	ynh_exec_err cat /var/log/mongodb/mongod.conf
 
 	ynh_systemd_action --service_name=$mongodb_servicename --action=restart --line_match="aiting for connections" --log_path="systemd" --length=100 --timeout=60
 
