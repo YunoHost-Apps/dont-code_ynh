@@ -5,15 +5,15 @@ It shall NOT be edited by hand.
 
 # Dont-code Services pour YunoHost
 
-[![Niveau d'intégration](https://dash.yunohost.org/integration/dont-code.svg)](https://dash.yunohost.org/appci/app/dont-code) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)  
+[![Niveau d’intégration](https://dash.yunohost.org/integration/dont-code.svg)](https://dash.yunohost.org/appci/app/dont-code) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)  
 [![Installer Dont-code Services avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=dont-code)
 
 *[Read this readme in english.](./README.md)*
 
-> *Ce package vous permet d'installer Dont-code Services rapidement et simplement sur un serveur YunoHost.
-Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l'installer et en profiter.*
+> *Ce package vous permet d’installer Dont-code Services rapidement et simplement sur un serveur YunoHost.
+Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l’installer et en profiter.*
 
-## Vue d'ensemble
+## Vue d’ensemble
 
 Dont-code is a low-code / no-code platform letting user create their own applications based on complete feature sets developed by IT.
 You can find more information here: https://dont-code.net
@@ -35,10 +35,10 @@ This Yunohost app installs the server part (services + mongo database) needed to
 
 **Démo :** https://dont-code.net/apps.html
 
-## Captures d'écran
+## Captures d’écran
 
-![Capture d'écran de Dont-code Services](./doc/screenshots/previewer.gif)
-![Capture d'écran de Dont-code Services](./doc/screenshots/ide.gif)
+![Capture d’écran de Dont-code Services](./doc/screenshots/previewer.gif)
+![Capture d’écran de Dont-code Services](./doc/screenshots/ide.gif)
 
 ## Avertissements / informations importantes
 
@@ -53,10 +53,10 @@ This Yunohost app installs the server part (services + mongo database) needed to
 
 ## Documentations et ressources
 
-* Site officiel de l'app : <https://dont-code.net>
+* Site officiel de l’app : <https://dont-code.net>
 * Documentation officielle utilisateur : <https://dont-code.net/news.html>
-* Documentation officielle de l'admin : <https://dont-code.net/developers.html>
-* Dépôt de code officiel de l'app : <https://github.com/dont-code>
+* Documentation officielle de l’admin : <https://dont-code.net/developers.html>
+* Dépôt de code officiel de l’app : <https://github.com/dont-code>
 * Documentation YunoHost pour cette app : <https://yunohost.org/app_dont-code>
 * Signaler un bug : <https://github.com/YunoHost-Apps/dont-code_ynh/issues>
 
@@ -72,4 +72,4 @@ ou
 sudo yunohost app upgrade dont-code -u https://github.com/YunoHost-Apps/dont-code_ynh/tree/testing --debug
 ```
 
-**Plus d'infos sur le packaging d'applications :** <https://yunohost.org/packaging_apps>
+**Plus d’infos sur le packaging d’applications :** <https://yunohost.org/packaging_apps>
