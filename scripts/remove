@@ -27,6 +27,7 @@ db_user=$(ynh_app_setting_get --app=$app --key=db_user)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 html_path=$(ynh_app_setting_get --app=$app --key=html_path)
 document_path=$(ynh_app_setting_get --app=$app --key=document_path)
+public_key=$(ynh_app_setting_get --app=$app --key=public_key)
 
 PORT_LIST=($port_ide $port_preview $port_project $port_data)
 
@@ -134,6 +135,13 @@ ynh_script_progression --message="Removing various files..." --weight=1
 
 # Remove the log files
 ynh_secure_remove --file="/var/log/$app"
+
+if [ -n "$public_key" ]
+then
+  ynh_script_progression --message="Removing ssh dev access" --weight=1
+  ynh_secure_remove --file="/etc/sudoers.d/$app-sudoers"
+
+fi
 
 #=================================================
 # GENERIC FINALIZATION
