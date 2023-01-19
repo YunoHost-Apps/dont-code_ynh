@@ -322,10 +322,10 @@ ynh_install_mongo() {
 	ynh_exec_err uname -a
 
 	# crash mongod and display log
+  ynh_exec_err cat /proc/cpuinfo | grep --color avx
 	/usr/bin/mongod --help 1> mongo-crash.txt 2>&1
 	ynh_exec_err ls -al /var/log
 	ynh_exec_err cat -n 30 /var/log/syslog
-
 	ynh_systemd_action --service_name=$mongodb_servicename --action=restart --line_match="aiting for connections" --log_path="systemd" --length=100 --timeout=60
 
 	# Integrate MongoDB service in YunoHost
