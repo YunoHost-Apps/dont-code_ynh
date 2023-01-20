@@ -111,7 +111,7 @@ PORT_LIST=($port_ide $port_preview $port_project $port_data)
 ynh_script_progression --message="Installing dependencies..." --weight=1
 
 # Install the required version of Java
-# ynh_install_java --java_version=$java_version --jdk_type=jre
+ynh_install_java --java_version=$java_version --jdk_type=jre
 
 ### `ynh_install_app_dependencies` allows you to add any "apt" dependencies to the package.
 ### Those deb packages will be installed as dependencies of this package.
