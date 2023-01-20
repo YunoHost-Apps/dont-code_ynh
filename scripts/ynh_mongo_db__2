@@ -313,19 +313,20 @@ ynh_install_mongo() {
 	mongo_version="${mongo_version:-$YNH_MONGO_VERSION}"
 
 	ynh_print_info --message="Installing MongoDB Community Edition ..."
-	ynh_install_extra_app_dependencies --repo="deb http://repo.mongodb.org/apt/debian $(ynh_get_debian_release)/mongodb-org/$mongo_version main" --package="mongodb-org mongodb-org-server mongodb-org-tools mongodb-mongosh" --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
+	# Install the version that works with the host cpu (see https://docs.mongodb.com/manual/administration/production-notes/#x86_64)
+	local mongo_debian_release=$(ynh_get_debian_release)
+  if [[ ""$(cat /proc/cpuinfo) == *"avx"* && "$mongo_debian_release" != "buster" ]]; then
+    mongo_debian_release="buster"
+    ynh_print_warn --message="Installing Mongo buster version to support your cpu."
+  fi
+
+	ynh_install_extra_app_dependencies --repo="deb http://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" --package="mongodb-org mongodb-org-server mongodb-org-tools mongodb-mongosh" --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
 	mongodb_servicename=mongod
 
 	# Make sure MongoDB is started and enabled
-#	systemctl enable $mongodb_servicename --quiet
-#	systemctl daemon-reload --quiet
-	ynh_exec_err uname -a
+	systemctl enable $mongodb_servicename --quiet
+	systemctl daemon-reload --quiet
 
-	# crash mongod and display log
-  ynh_exec_err cat /proc/cpuinfo | grep --color avx
-	/usr/bin/mongod --help 1> mongo-crash.txt 2>&1
-	ynh_exec_err ls -al /var/log
-	ynh_exec_err cat -n 30 /var/log/syslog
 	ynh_systemd_action --service_name=$mongodb_servicename --action=restart --line_match="aiting for connections" --log_path="systemd" --length=100 --timeout=60
 
 	# Integrate MongoDB service in YunoHost
