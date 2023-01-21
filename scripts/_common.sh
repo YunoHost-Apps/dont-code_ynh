@@ -5,7 +5,7 @@
 #=================================================
 java_version=17
 
-mongo_version=6.0
+mongo_version=5.0
 
 # Java dependencies used by the app will be installed through the Java helper
 pkg_dependencies=""
