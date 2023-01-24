@@ -318,7 +318,11 @@ ynh_install_mongo() {
 
 	if [[ $(cat /proc/cpuinfo) != *"avx"* && "$mongo_version" != "4.4" ]]; then
     ynh_print_error --message="The version of Mongo you're trying to install may not be compatible with your cpu (Missing avx instruction set)."
-  fi
+ fi
+        if [[ $(cat /proc/cpuinfo) != *"avx"* && "$mongo_version" == "4.4" ]]; then
+    ynh_print_warn --message="Installing Mongo for Buster due to incompatible cpu."
+    mongo_debian_release=buster
+ fi
 
 	ynh_install_extra_app_dependencies --repo="deb http://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" --package="mongodb-org mongodb-org-server mongodb-org-tools mongodb-mongosh" --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
 	mongodb_servicename=mongod
