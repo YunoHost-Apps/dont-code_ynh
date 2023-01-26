@@ -12,10 +12,10 @@
 		setup_sub_dir=1
 		setup_root=1
 		setup_nourl=0
-		setup_private=0
+		setup_private=1
 		setup_public=1
-		upgrade=0
-		upgrade=0	from_commit=CommitHash
+		upgrade=1
+		upgrade=1	from_commit=7852cc4bf44ff20ee51fe35f3f53dc105e0f6d79
 		backup_restore=1
 		multi_instance=0
 		port_already_use=1 (8083)
@@ -24,6 +24,6 @@
 Email=ger@shared.collin.best
 Notification=Down
 ;;; Upgrade options
-	; commit=CommitHash
-		name=Name and date of the commit.
+	; commit=7852cc4bf44ff20ee51fe35f3f53dc105e0f6d79
+		name=2023-01-07 - Added Ssh support for dev.
 		manifest_arg=domain=DOMAIN&path=PATH&is_public=1&language=fr&admin=USER&password=pass&port=666&
