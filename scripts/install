@@ -8,7 +8,7 @@
 
 source _common.sh
 source ynh_mongo_db__2
-source ynh_java
+source ynh_install_java
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -77,7 +77,7 @@ ynh_app_setting_set --app=$app --key=path --value=$path_url
 #=================================================
 # FIND AND OPEN A PORT
 #=================================================
-ynh_script_progression --message="Finding an available ports..." --weight=1
+ynh_script_progression --message="Finding available ports..." --weight=1
 
 ### Use these lines if you have to open a port for the application
 ### `ynh_find_port` will find the first available port starting from the given port.
