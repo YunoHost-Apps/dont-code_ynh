@@ -8,7 +8,7 @@
 
 source _common.sh
 source ynh_mongo_db__2
-source ynh_java
+source ynh_install_java
 source /usr/share/yunohost/helpers
 
 #=================================================
