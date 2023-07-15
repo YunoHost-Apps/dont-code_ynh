@@ -8,7 +8,7 @@
 
 source _common.sh
 source ynh_mongo_db__2
-source ynh_java
+source ynh_install_java
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -103,14 +103,20 @@ ynh_script_progression --message="Removing NGINX web server configuration..." --
 # Remove the dedicated NGINX config
 ynh_remove_nginx_config
 
-ynh_secure_remove --file="/etc/sudoers.d/$app-sudoers"
+if [ -n "$public_key" ]
+then
+  ynh_secure_remove --file="/etc/sudoers.d/$app-sudoers"
+fi
 
 #=================================================
 # REMOVE DEPENDENCIES
 #=================================================
 ynh_script_progression --message="Removing dependencies..." --weight=1
 
-# Remove metapackage and its dependencies, including java
+# Remove java
+ynh_remove_java
+
+# Remove apackage and its dependencies, including Java if needed
 ynh_remove_app_dependencies
 
 #=================================================
