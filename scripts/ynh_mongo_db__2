@@ -321,7 +321,7 @@ ynh_install_mongo() {
     mongo_version="4.4"
   fi
   if [[ "$mongo_version" == "4.4" ]]; then
-    ynh_print_warn --message="Switching to special package install for Mongo 4.4 to see if that works."
+    ynh_print_warn --message="Switching to buster package install for Mongo 4.4."
     mongo_debian_release=buster
     mongo_packages="mongodb-org-server mongodb-database-tools mongodb-mongosh-shared-openssl11"
   fi
