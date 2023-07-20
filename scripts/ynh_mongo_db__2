@@ -314,17 +314,19 @@ ynh_install_mongo() {
 
 	ynh_print_info --message="Installing MongoDB Community Edition ..."
 	local mongo_debian_release=$(ynh_get_debian_release)
+  local mongo_packages="mongodb-org-server mongodb-database-tools mongodb-org-shell"
 
 	if [[ $(cat /proc/cpuinfo) != *"avx"* && "$mongo_version" != "4.4" ]]; then
     ynh_print_warn --message="Installing Mongo 4.4 as $mongo_version is not compatible with your cpu (see https://docs.mongodb.com/manual/administration/production-notes/#x86_64)."
     mongo_version="4.4"
   fi
-  if [[ "$mongo_version" == "4.4" && "$mongo_debian_release" != "buster" ]]; then
-    ynh_print_warn --message="Keeping $mongo_debian_release install for Mongo 4.4 to see if that works."
-    #mongo_debian_release=buster
+  if [[ "$mongo_version" == "4.4" ]]; then
+    ynh_print_warn --message="Switching to buster package install for Mongo 4.4."
+    mongo_debian_release=buster
+    mongo_packages="mongodb-org-server mongodb-database-tools mongodb-mongosh-shared-openssl11"
   fi
 
-	ynh_install_extra_app_dependencies --repo="deb http://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" --package="mongodb-org mongodb-org-server mongodb-org-tools mongodb-mongosh" --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
+	ynh_install_extra_app_dependencies --repo="deb http://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" --package="$mongo_packages" --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
 	mongodb_servicename=mongod
 
 	# Make sure MongoDB is started and enabled
