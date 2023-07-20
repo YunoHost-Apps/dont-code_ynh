@@ -6,7 +6,7 @@
         "en": "Install services and databases needed to support Dont-code platform",
         "fr": "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
     },
-    "version": "0.2~ynh4",
+    "version": "0.2~ynh5",
     "url": "https://dont-code.net",
     "upstream": {
         "license": "AGPL-3.0-or-later",
