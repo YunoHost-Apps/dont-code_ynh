@@ -58,7 +58,7 @@ This Yunohost app installs the server part (services + mongo database) needed to
 * Documentation officielle utilisateur : <https://dont-code.net/news.html>
 * Documentation officielle de l’admin : <https://dont-code.net/developers.html>
 * Dépôt de code officiel de l’app : <https://github.com/dont-code>
-* Documentation YunoHost pour cette app : <https://yunohost.org/app_dont-code>
+* YunoHost Store: <https://apps.yunohost.org/app/dont-code>
 * Signaler un bug : <https://github.com/YunoHost-Apps/dont-code_ynh/issues>
 
 ## Informations pour les développeurs
