@@ -1,6 +1,0 @@
-SOURCE_URL=https://github.com/dont-code/release/releases/download/v0.2.10/dont-code-release-runners.zip
-SOURCE_SUM=f20bfa0423d48015a3507b0555d30d57fa594657a4bca55ad869fca8fbad125d
-SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=zip
-SOURCE_IN_SUBDIR=false
-SOURCE_EXTRACT=true

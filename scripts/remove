@@ -8,156 +8,46 @@
 
 source _common.sh
 source ynh_mongo_db__2
-source ynh_install_java
 source /usr/share/yunohost/helpers
 
 #=================================================
-# LOAD SETTINGS
+# REMOVE SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Loading installation settings..." --weight=1
-
-app=$YNH_APP_INSTANCE_NAME
-
-domain=$(ynh_app_setting_get --app=$app --key=domain)
-port_ide=$(ynh_app_setting_get --app=$app --key=port_ide)
-port_preview=$(ynh_app_setting_get --app=$app --key=port_preview)
-port_project=$(ynh_app_setting_get --app=$app --key=port_project)
-port_data=$(ynh_app_setting_get --app=$app --key=port_data)
-db_user=$(ynh_app_setting_get --app=$app --key=db_user)
-final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-html_path=$(ynh_app_setting_get --app=$app --key=html_path)
-document_path=$(ynh_app_setting_get --app=$app --key=document_path)
-public_key=$(ynh_app_setting_get --app=$app --key=public_key)
-
-PORT_LIST=($port_ide $port_preview $port_project $port_data)
-
-#=================================================
-# STANDARD REMOVE
-#=================================================
-# REMOVE SERVICE INTEGRATION IN YUNOHOST
-#=================================================
-ynh_script_progression --message="Removing $app services..." --weight=1
+ynh_script_progression --message="Removing system configurations related to $app..." --weight=1
 
 # Remove the service from the list of services known by YunoHost (added from `yunohost service add`)
-for service_name in "${SERVICES_LIST[@]}"
-do
-  if ynh_exec_warn_less yunohost service status "${app}-${service_name}" >/dev/null
-  then
-    yunohost service remove "${app}-${service_name}"
-  fi
+for service_name in "${SERVICES_LIST[@]}"; do
+    if ynh_exec_warn_less yunohost service status "${app}-${service_name}" >/dev/null; then
+        yunohost service remove "${app}-${service_name}"
+    fi
 done
-
-#=================================================
-# STOP AND REMOVE SERVICE
-#=================================================
-ynh_script_progression --message="Stopping and removing the systemd service..." --weight=1
 
 # Remove the dedicated systemd config
-for service_name in "${SERVICES_LIST[@]}"
-do
-  ynh_remove_systemd_config --service="${app}-${service_name}"
+for service_name in "${SERVICES_LIST[@]}"; do
+    ynh_remove_systemd_config --service="${app}-${service_name}"
 done
-
-#=================================================
-# REMOVE LOGROTATE CONFIGURATION
-#=================================================
-ynh_script_progression --message="Removing logrotate configuration..." --weight=1
-
-# Remove the app-specific logrotate config
-ynh_remove_logrotate
-
-#=================================================
-# REMOVE THE MONGO DATABASE
-#=================================================
-ynh_script_progression --message="Removing the Mongo databases..." --weight=1
-
-# Remove a database if it exists, along with the associated user
-for db_name in "${MONGO_DB_LIST[@]}"
-do
-  ynh_mongo_remove_db --db_user=$db_user --db_name=$db_name
-done
-# Remove mongo itself if not used anymore
-ynh_remove_mongo
-
-#=================================================
-# REMOVE APP MAIN DIR
-#=================================================
-ynh_script_progression --message="Removing app main directory..." --weight=1
-
-# Remove the app directory securely
-ynh_secure_remove --file="$final_path"
-
-#=================================================
-# REMOVE DOCUMENT DIR
-#=================================================
-ynh_script_progression --message="Removing html directory..." --weight=1
-
-# Remove the app directory securely
-ynh_secure_remove --file="$html_path"
-
-#=================================================
-# REMOVE NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Removing NGINX web server configuration..." --weight=1
 
 # Remove the dedicated NGINX config
 ynh_remove_nginx_config
 
-if [ -n "$public_key" ]
-then
-  ynh_secure_remove --file="/etc/sudoers.d/$app-sudoers"
-fi
+# Remove the app-specific logrotate config
+ynh_remove_logrotate
 
-#=================================================
-# REMOVE DEPENDENCIES
-#=================================================
-ynh_script_progression --message="Removing dependencies..." --weight=1
 
-# Remove java
-ynh_remove_java
-
-# Remove apackage and its dependencies, including Java if needed
-ynh_remove_app_dependencies
-
-#=================================================
-# CLOSE ALL PORTS
-#=================================================
-
-for port in "${PORT_LIST[@]}"
-do
-  if yunohost firewall list | grep -q "\- $port$"
-  then
-    ynh_script_progression --message="Closing port $port..." --weight=1
-    ynh_exec_warn_less yunohost firewall disallow TCP $port
-  fi
+# Remove a database if it exists, along with the associated user
+for db_name in "${MONGO_DB_LIST[@]}"; do
+    ynh_mongo_remove_db --db_user=$db_user --db_name=$db_name
 done
 
-#=================================================
-# SPECIFIC REMOVE
-#=================================================
-# REMOVE VARIOUS FILES
-#=================================================
-ynh_script_progression --message="Removing various files..." --weight=1
+# Remove mongo itself if not used anymore
+ynh_remove_mongo
+
+if [ -f "/etc/sudoers.d/$app-sudoers" ]; then
+    ynh_secure_remove --file="/etc/sudoers.d/$app-sudoers"
+fi
 
 # Remove the log files
 ynh_secure_remove --file="/var/log/$app"
-
-if [ -n "$public_key" ]
-then
-  ynh_script_progression --message="Removing ssh dev access" --weight=1
-  ynh_secure_remove --file="/etc/sudoers.d/$app-sudoers"
-
-fi
-
-#=================================================
-# GENERIC FINALIZATION
-#=================================================
-# REMOVE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Removing the dedicated system user..." --weight=1
-
-# Delete a system user
-ynh_system_user_delete --username=$app
 
 #=================================================
 # END OF SCRIPT

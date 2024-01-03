@@ -3,18 +3,16 @@
 #=================================================
 # COMMON VARIABLES
 #=================================================
-java_version=17
-
 mongo_version=6.0
-
-# Java dependencies used by the app will be installed through the Java helper
-pkg_dependencies=""
 
 # List of services to be installed
 SERVICES_LIST=(ide preview project data)
 
 # List of Mongo databases to manage
 MONGO_DB_LIST=(dontCodeProjects dontCodeDemoProjects dontCodeData dontCodeTestProjects)
+
+# The list of port in the same order than the list of services
+PORT_LIST=("$port_ide" "$port_preview" "$port_project" "$port_data")
 
 #=================================================
 # PERSONAL HELPERS

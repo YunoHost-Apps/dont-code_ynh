@@ -8,7 +8,7 @@ Type=simple
 User=__APP__
 Group=__APP__
 Environment="quarkus_http_port=__PORT__"
-WorkingDirectory=__FINALPATH__/
+WorkingDirectory=__INSTALL_DIR__/
 ExecStart=__YNH_JAVA__ -jar __SERVICE_NAME__-services-runner.jar
 StandardOutput=append:/var/log/__APP__/__SERVICE_NAME__-__APP__.log
 StandardError=inherit
