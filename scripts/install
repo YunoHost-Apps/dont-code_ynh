@@ -22,6 +22,23 @@ chmod -R o-rwx "$install_dir"
 chown -R "$app:$app" "$install_dir"
 
 #=================================================
+# Configure document storage
+#=================================================
+ynh_script_progression --message="Configuring document storage..." --weight=1
+
+document_path=$data_dir/docs
+ynh_app_setting_set --app="$app" --key=document_path --value="$document_path"
+
+document_url=$(append_uri "https://${domain}${path}" "docs")
+ynh_app_setting_set --app="$app" --key=document_url --value="$document_url"
+
+# Add the status page
+ynh_add_config --template="index.html" --destination="$data_dir/index.html"
+
+chmod -R o-rwx "$data_dir"
+chown -R $app:www-data "$data_dir"
+
+#=================================================
 # ADD A CONFIGURATION
 #=================================================
 ynh_script_progression --message="Adding a configuration file..." --weight=1
@@ -60,23 +77,6 @@ if [ -n "$public_key" ]; then
     chown root:root "/etc/sudoers.d/$app-sudoers"
     chmod o-rwx,gu=r "/etc/sudoers.d/$app-sudoers"
 fi
-
-#=================================================
-# Configure document storage
-#=================================================
-ynh_script_progression --message="Configuring document storage..." --weight=1
-
-# Add the status page
-ynh_add_config --template="index.html" --destination="$data_dir/index.html"
-
-document_path=$data_dir/docs
-ynh_app_setting_set --app="$app" --key=document_path --value="$document_path"
-
-chmod -R o-rwx "$data_dir"
-chown -R $app:www-data "$data_dir"
-
-document_url=$(append_uri "https://${domain}${path}" "docs")
-ynh_app_setting_set --app="$app" --key=document_url --value="$document_url"
 
 #=================================================
 # INSTALL MONGO
