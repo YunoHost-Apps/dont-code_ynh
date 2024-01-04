@@ -21,6 +21,9 @@ ynh_setup_source --dest_dir="$install_dir"
 chmod -R o-rwx "$install_dir"
 chown -R "$app:$app" "$install_dir"
 
+mkdir /var/log/$app
+chown "$app:$app" /var/log/$app
+
 #=================================================
 # Configure document storage
 #=================================================
@@ -62,10 +65,6 @@ if [ -n "$public_key" ]; then
     chown -R "$app:$app" "$install_dir/.ssh"
     chmod 700 "$install_dir/.ssh"
     chmod 600 "$install_dir/.ssh/authorized_keys"
-
-    #=================================================
-    # Create restart services file
-    #=================================================
 
     # Enable restarting of services from ssh
     ynh_add_config --template="restart-services.sh" --destination="$install_dir/restart-services.sh"
