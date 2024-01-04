@@ -3,6 +3,7 @@
 #=================================================
 # COMMON VARIABLES
 #=================================================
+
 mongo_version=6.0
 
 # List of services to be installed
@@ -13,6 +14,9 @@ MONGO_DB_LIST=(dontCodeProjects dontCodeDemoProjects dontCodeData dontCodeTestPr
 
 # The list of port in the same order than the list of services
 PORT_LIST=("$port_ide" "$port_preview" "$port_project" "$port_data")
+
+java_version=17
+ynh_java="/usr/lib/jvm/java-${java_version}-openjdk-amd64/bin/java"
 
 #=================================================
 # PERSONAL HELPERS
