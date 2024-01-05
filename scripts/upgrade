@@ -28,7 +28,7 @@ done
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
-if [[ -n "$document_path" ]]; then
+if [[ -n "${document_path:-}" ]]; then
     # Renamed setting key
     document_dir="$document_path"
     ynh_app_setting_delete --app="$app" --key=document_path
