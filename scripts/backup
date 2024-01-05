@@ -12,50 +12,21 @@ source ../settings/scripts/ynh_mongo_db__2
 source /usr/share/yunohost/helpers
 
 #=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-ynh_clean_setup () {
-	### Remove this function if there's nothing to clean before calling the remove script.
-	true
-}
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
-
-#=================================================
-# LOAD SETTINGS
-#=================================================
-ynh_print_info --message="Loading installation settings..."
-
-app=$YNH_APP_INSTANCE_NAME
-
-final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-domain=$(ynh_app_setting_get --app=$app --key=domain)
-html_path=$(ynh_app_setting_get --app=$app --key=html_path)
-document_path=$(ynh_app_setting_get --app=$app --key=document_path)
-public_key=$(ynh_app_setting_get --app=$app --key=public_key)
-
-#=================================================
 # DECLARE DATA AND CONF FILES TO BACKUP
 #=================================================
 ynh_print_info --message="Declaring files to be backed up..."
-
-### N.B. : the following 'ynh_backup' calls are only a *declaration* of what needs
-### to be backuped and not an actual copy of any file. The actual backup that
-### creates and fill the archive with the files happens in the core after this
-### script is called. Hence ynh_backups calls takes basically 0 seconds to run.
 
 #=================================================
 # BACKUP THE APP MAIN DIR
 #=================================================
 
-ynh_backup --src_path="$final_path"
+ynh_backup --src_path="$install_dir"
 
 #=================================================
 # BACKUP THE HTML AND DOCUMENT DIR
 #=================================================
 
-ynh_backup --src_path="$html_path" --is_big
+ynh_backup --src_path="$data_dir" --is_big
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION
@@ -66,12 +37,6 @@ ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 #=================================================
 # SPECIFIC BACKUP
 #=================================================
-if [ -n "$public_key" ]
-then
-  ynh_backup --src_path="/etc/sudoers.d/$app-sudoers"
-fi
-
-
 # BACKUP LOGROTATE
 #=================================================
 
@@ -81,24 +46,23 @@ ynh_backup --src_path="/etc/logrotate.d/$app"
 # BACKUP SYSTEMD services
 #=================================================
 
-for service_name in "${SERVICES_LIST[@]}"
-do
+for service_name in "${SERVICES_LIST[@]}"; do
   ynh_backup --src_path="/etc/systemd/system/${app}-${service_name}.service"
 done
 
 #=================================================
-# BACKUP VARIOUS FILES
+# SPECIFIC BACKUP
 #=================================================
-
-# ynh_backup --src_path="/etc/cron.d/$app"
+if [ -n "$public_key" ]; then
+  ynh_backup --src_path="/etc/sudoers.d/$app-sudoers"
+fi
 
 #=================================================
 # BACKUP THE MONGO DATABASES
 #=================================================
 ynh_print_info --message="Backing up the Mongo databases..."
 
-for db_name in "${MONGO_DB_LIST[@]}"
-do
+for db_name in "${MONGO_DB_LIST[@]}"; do
   ynh_mongo_dump_db --database=$db_name > ./dump-${db_name}.bson
 done
 
