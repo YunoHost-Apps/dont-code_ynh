@@ -48,14 +48,7 @@ if [ -n "$public_key" ]; then
     chmod 700 "$install_dir/.ssh"
     chmod 600 "$install_dir/.ssh/authorized_keys"
 
-    # Enable restart of services for the dont-code user
-    chown "$app:$app" "$install_dir/restart-services.sh"
-    chmod o-rwx,gu=rwx "$install_dir/restart-services.sh"
-
-    # Add sudoers file for this specific command
-    ynh_restore_file --origin_path="/etc/sudoers.d/$app-sudoers"
-    chown root:root "/etc/sudoers.d/$app-sudoers"
-    chmod o-rwx,gu=r "/etc/sudoers.d/$app-sudoers"
+    _install_restart_script_and_sudoers
 fi
 
 #=================================================
@@ -76,6 +69,7 @@ ynh_mongo_setup_db --db_user=$db_user --db_name=${MONGO_DB_LIST[0]} --db_pwd=$db
 for db_name in "${MONGO_DB_LIST[@]}"; do
     ynh_mongo_restore_db --database="$db_name" < "./dump-${db_name}.bson"
 done
+
 #=================================================
 # RESTORE SYSTEM CONFIGURATIONS
 #=================================================

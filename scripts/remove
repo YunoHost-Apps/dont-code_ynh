@@ -42,9 +42,7 @@ done
 # Remove mongo itself if not used anymore
 ynh_remove_mongo
 
-if [ -f "/etc/sudoers.d/$app-sudoers" ]; then
-    ynh_secure_remove --file="/etc/sudoers.d/$app-sudoers"
-fi
+_remove_restart_script_and_sudoers
 
 # Remove the log files
 ynh_secure_remove --file="/var/log/$app"
