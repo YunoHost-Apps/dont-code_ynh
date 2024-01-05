@@ -90,8 +90,8 @@ ynh_script_progression --message="Configuring document storage..." --weight=1
 
 ynh_add_config --template="index.html" --destination="$data_dir/index.html"
 
-chmod o-rwx "$data_dir"
-chown "$app:www-data" "$data_dir"
+chmod -R o-rwx "$data_dir"
+chown -R "$app:www-data" "$data_dir"
 
 #=================================================
 # ADD SSH ACCESS
