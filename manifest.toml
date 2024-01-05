@@ -63,6 +63,8 @@ ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requiremen
 
     [resources.data_dir]
     subdirs = ["docs"]
+    owner = "__APP__:rwx"
+    group = "www-data:rwx"
 
     [resources.permissions]
     main.url = "/"

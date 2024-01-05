@@ -33,8 +33,8 @@ ynh_restore_file --origin_path="$data_dir" --not_mandatory
 
 mkdir -p $document_path
 
-chmod -R o-rwx "$html_path"
-chown -R $app:www-data "$html_path"
+chmod -R o-rwx "$data_dir"
+chown -R $app:www-data "$data_dir"
 
 #=================================================
 # ADD SSH ACCESS
