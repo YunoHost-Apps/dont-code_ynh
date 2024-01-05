@@ -29,8 +29,8 @@ chown "$app:$app" /var/log/$app
 #=================================================
 ynh_script_progression --message="Configuring document storage..." --weight=1
 
-document_path=$data_dir/docs
-ynh_app_setting_set --app="$app" --key=document_path --value="$document_path"
+document_dir=$data_dir/docs
+ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
 
 document_url=$(append_uri "https://${domain}${path}" "docs")
 ynh_app_setting_set --app="$app" --key=document_url --value="$document_url"

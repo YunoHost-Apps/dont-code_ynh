@@ -31,7 +31,7 @@ ynh_script_progression --message="Restoring the document storage..." --weight=1
 
 ynh_restore_file --origin_path="$data_dir" --not_mandatory
 
-mkdir -p $document_path
+mkdir -p $document_dir
 
 chmod -R o-rwx "$data_dir"
 chown -R $app:www-data "$data_dir"

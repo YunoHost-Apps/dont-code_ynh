@@ -19,7 +19,7 @@ StandardError=inherit
 # Details for these options: https://www.freedesktop.org/software/systemd/man/systemd.exec.html
 
 # Enable the writing of uploaded documents
-ReadWritePaths=__DOCUMENT_PATH__
+ReadWritePaths=__DOCUMENT_DIR__
 NoNewPrivileges=yes
 PrivateTmp=yes
 PrivateDevices=yes

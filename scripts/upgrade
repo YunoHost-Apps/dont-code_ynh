@@ -28,9 +28,17 @@ done
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
+if [[ -n "$document_path" ]]; then
+    # Renamed setting key
+    document_dir="$document_path"
+    ynh_app_setting_delete --app="$app" --key=document_path
+    ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
+fi
+
 if [[ -n "${html_path:-}" ]]; then
     # Migrate html_path to data_dir
     mv "$html_path/index.html" "$html_path/docs" "$data_dir"
+    old_doc_dir="$html_path/docs"
     ynh_secure_remove --file="$html_path"
     ynh_app_setting_delete --app="$app" --key=html_path
     # FIXME: other settings
@@ -40,7 +48,7 @@ if [[ -n "${html_path:-}" ]]; then
 
     # Update the path in .env file
     ynh_backup_if_checksum_is_different --file="$install_dir/.env"
-    ynh_replace_string --match_string="$old_doc_path" --replace_string="$document_path" --target_file="$install_dir/.env"
+    ynh_replace_string --match_string="$old_doc_dir" --replace_string="$document_dir" --target_file="$install_dir/.env"
     ynh_store_file_checksum --file="$install_dir/.env"
 fi
 
