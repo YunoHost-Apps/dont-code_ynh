@@ -28,6 +28,12 @@ done
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
+# Missing settings ?
+if [ -z "${public_key+x}" ]; then
+    public_key=""
+    ynh_app_setting_set --app="$app" --key=public_key --value="$public_key"
+fi
+
 if [[ -n "${document_path:-}" ]]; then
     # Renamed setting key
     document_dir="$document_path"
