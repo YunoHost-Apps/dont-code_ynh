@@ -7,7 +7,7 @@ name = "Dont-code Services"
 description.en = "Install services and databases needed to support Dont-code platform"
 description.fr = "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
 
-version = "0.2~ynh5"
+version = "0.2.10~ynh5"
 
 maintainers = ["Dont-code Team"]
 
@@ -56,6 +56,7 @@ ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requiremen
     in_subdir = false
     autoupdate.strategy = "latest_github_release"
     autoupdate.asset = "dont-code-release-runners.zip"
+    autoupdate.upstream = "https://github.com/dont-code/release"
 
     [resources.system_user]
 
