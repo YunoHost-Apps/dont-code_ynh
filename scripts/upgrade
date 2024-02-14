@@ -41,6 +41,12 @@ if [[ -n "${document_path:-}" ]]; then
     ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
 fi
 
+# document dir has moved from html_path to data_dir, so set the variable accordingly
+if [[ ${document_dir} == ${html_path}* ]]; then
+    document_dir=$data_dir/docs
+    ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
+fi
+
 if [[ -n "${html_path:-}" ]]; then
     # Migrate html_path to data_dir
     mv "$html_path/index.html" "$html_path/docs" "$data_dir"
