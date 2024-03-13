@@ -42,6 +42,13 @@ if [[ -n "${document_path:-}" ]]; then
 fi
 
 if [[ -n "${html_path:-}" ]]; then
+
+    # document dir has moved from html_path to data_dir, so set the variable accordingly
+    if [[ ${document_dir} == ${html_path}* ]]; then
+        document_dir=$data_dir/docs
+        ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
+    fi
+
     # Migrate html_path to data_dir
     mv "$html_path/index.html" "$html_path/docs" "$data_dir"
     old_doc_dir="$html_path/docs"
@@ -56,6 +63,7 @@ if [[ -n "${html_path:-}" ]]; then
     ynh_backup_if_checksum_is_different --file="$install_dir/.env"
     ynh_replace_string --match_string="$old_doc_dir" --replace_string="$document_dir" --target_file="$install_dir/.env"
     ynh_store_file_checksum --file="$install_dir/.env"
+
 fi
 
 # Regenerate the .env file if the document_url was incorrectly set before
@@ -83,7 +91,7 @@ if [ "$upgrade_type" == "UPGRADE_APP" ]; then
     ynh_script_progression --message="Upgrading source files..." --weight=1
 
     # Download, check integrity, uncompress and patch the source from app.src
-    ynh_setup_source --dest_dir="$install_dir"
+    ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep ".env .ssh/authorized_keys"
 fi
 
 chmod -R o-rwx "$install_dir"
