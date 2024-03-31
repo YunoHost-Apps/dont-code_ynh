@@ -7,7 +7,7 @@ name = "Dont-code Services"
 description.en = "Install services and databases needed to support Dont-code platform"
 description.fr = "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
 
-version = "0.2.10~ynh6"
+version = "0.3.0~ynh1"
 
 maintainers = ["Dont-code Team"]
 
@@ -51,8 +51,8 @@ ram.runtime = "400M"
 
 [resources]
     [resources.sources.main]
-    url = "https://github.com/dont-code/release/releases/download/v0.2.10/dont-code-release-runners.zip"
-    sha256 = "f20bfa0423d48015a3507b0555d30d57fa594657a4bca55ad869fca8fbad125d"
+    url = "https://github.com/dont-code/release/releases/download/v0.3.0/dont-code-release-runners.zip"
+    sha256 = "959d27842e867e725ad12b7dc26041f9cb125d9e2d9d93900ff0ea9e05871755"
     in_subdir = false
     autoupdate.strategy = "latest_github_release"
     autoupdate.asset = "dont-code-release-runners.zip"
