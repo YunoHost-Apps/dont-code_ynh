@@ -7,7 +7,7 @@ name = "Dont-code Services"
 description.en = "Install services and databases needed to support Dont-code platform"
 description.fr = "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
 
-version = "0.2.10~ynh6"
+version = "0.3.1~ynh1"
 
 maintainers = ["Dont-code Team"]
 
@@ -22,7 +22,7 @@ code = "https://github.com/dont-code"
 [integration]
 yunohost = ">= 11.0.0"
 architectures = "all"
-multi_instance = false
+multi_instance = true
 ldap = false
 sso = false
 disk = "50M"
@@ -39,6 +39,12 @@ ram.runtime = "400M"
     type = "path"
     default = "/dont-code"
 
+    [install.tenant]
+    ask.en = "The name of the tenant these services will support. This configures database name to use. Can be empty if non necessary."
+    ask.fr = "Le nom du tenant associé a ces services. Permet de configurer une base de donnée séparée. Peut-être vide si non nécessaire."
+    type = "string"
+    optional = true
+
     [install.public_key]
     ask.en = "SSH Public key to allow service updates as part of delivery process, leave empty to disable."
     ask.fr = "Clef publique SSH permettant la mise à jour des services via une deploiement automatique, inactif si non renseigné."
@@ -51,8 +57,8 @@ ram.runtime = "400M"
 
 [resources]
     [resources.sources.main]
-    url = "https://github.com/dont-code/release/releases/download/v0.2.10/dont-code-release-runners.zip"
-    sha256 = "f20bfa0423d48015a3507b0555d30d57fa594657a4bca55ad869fca8fbad125d"
+    url = "https://github.com/dont-code/release/releases/download/v0.3.1/dont-code-release-runners.zip"
+    sha256 = "b69361f5383c904e30d551efd7a64cc155459af6a25e32fd5ca41633bcfb3658"
     in_subdir = false
     autoupdate.strategy = "latest_github_release"
     autoupdate.asset = "dont-code-release-runners.zip"

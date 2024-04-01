@@ -85,9 +85,11 @@ ynh_script_progression --message="Creating the Mongo databases..." --weight=1
 db_user=$(ynh_sanitize_dbid --db_name="${app}")
 ynh_app_setting_set --app="$app" --key=db_user --value="$db_user"
 
-# We should probably enable databases to the user, but for now, we connect through admin
-# No need to create other databases: Mongo creates them on the fly
-ynh_mongo_setup_db --db_user="$db_user" --db_name="${MONGO_DB_LIST[0]}"
+# Let's create all databases needed, and assign them to the user
+
+for db_name in "${MONGO_DB_LIST[@]}"; do
+    ynh_mongo_setup_db --db_user="$db_user" --db_pwd="$db_pwd" --db_name="dontCode$tenant${db_name}"
+done
 
 #=================================================
 # SYSTEM CONFIGURATION
