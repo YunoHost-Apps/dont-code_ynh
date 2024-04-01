@@ -86,6 +86,9 @@ db_user=$(ynh_sanitize_dbid --db_name="${app}")
 ynh_app_setting_set --app="$app" --key=db_user --value="$db_user"
 
 # Let's create all databases needed, and assign them to the user
+local new_db_pwd=$(ynh_string_random) # Generate a random password
+	# If $db_pwd is not provided, use new_db_pwd instead for db_pwd
+db_pwd="${db_pwd:-$new_db_pwd}"
 
 for db_name in "${MONGO_DB_LIST[@]}"; do
     ynh_mongo_setup_db --db_user="$db_user" --db_pwd="$db_pwd" --db_name="dontCode$tenant${db_name}"
