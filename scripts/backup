@@ -63,7 +63,7 @@ fi
 ynh_print_info --message="Backing up the Mongo databases..."
 
 for db_name in "${MONGO_DB_LIST[@]}"; do
-  ynh_mongo_dump_db --database="dontCode$tenant$db_name" > ./dump-${tenant}${db_name}.bson
+  ynh_mongo_dump_db --database="dontCode$tenant$db_name" > ./dump-dontCode${tenant}${db_name}.bson
 done
 
 #=================================================

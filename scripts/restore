@@ -66,7 +66,7 @@ ynh_script_progression --message="Restoring the Mongo databases..." --weight=1
 
 for db_name in "${MONGO_DB_LIST[@]}"; do
     ynh_mongo_setup_db --db_user="$db_user" --db_pwd="$db_pwd" --db_name="dontCode$tenant${db_name}"
-    ynh_mongo_restore_db --database="dontCode$tenant$db_name" < "./dump-${tenant}${db_name}.bson"
+    ynh_mongo_restore_db --database="dontCode$tenant$db_name" < "./dump-dontCode${tenant}${db_name}.bson"
 done
 
 #=================================================
