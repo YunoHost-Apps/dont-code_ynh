@@ -5,10 +5,12 @@ test_format = 1.0
 [default]
 
     args.public_key = ""
+    args.tenant = "Test"
     # -------------------------------
     # Commits to test upgrade from
     # -------------------------------
 
     test_upgrade_from.7852cc4bf44ff20ee51fe35f3f53dc105e0f6d79.name= "2023-01-07 - Added Ssh support for dev."
     test_upgrade_from.e89eebdac9f59202202d07972e274ebe6fc7c51c.name= "Before Manifest v2."
+    test_upgrade_from.13b9ba1eb3ccad38329ee2c7dadad00c18fe5e83.name= "Before switching to multi_instance."
     

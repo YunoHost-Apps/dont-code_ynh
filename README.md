@@ -9,7 +9,7 @@ It shall NOT be edited by hand.
 
 [![Install Dont-code Services with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=dont-code)
 
-*[Read this README is other languages.](./ALL_README.md)*
+*[Read this README in other languages.](./ALL_README.md)*
 
 > *This package allows you to install Dont-code Services quickly and simply on a YunoHost server.*  
 > *If you don't have YunoHost, please consult [the guide](https://yunohost.org/install) to learn how to install it.*
@@ -32,7 +32,7 @@ This Yunohost app installs the server part (services + mongo database) needed to
 - As well any documents or images uploaded by users will be backed up
 
 
-**Shipped version:** 0.2.10~ynh7
+**Shipped version:** 0.3.1~ynh1
 
 **Demo:** <https://dont-code.net/apps.html>
 
