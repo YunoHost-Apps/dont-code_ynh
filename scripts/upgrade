@@ -117,6 +117,10 @@ ynh_script_progression --message="Configuring document storage..." --weight=1
 
 ynh_add_config --template="index.html" --destination="$data_dir/index.html"
 
+# Add the repository pages
+ynh_add_config --template="repository-next.json" --destination="$data_dir/repository-next.json"
+ynh_add_config --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
+
 chmod -R o-rwx "$data_dir"
 chown -R "$app:www-data" "$data_dir"
 

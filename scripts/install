@@ -35,8 +35,13 @@ ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
 document_url=$(append_uri "https://${domain}${path}" "docs")
 ynh_app_setting_set --app="$app" --key=document_url --value="$document_url"
 
-# Add the status page
+# Add the status pageindex
 ynh_add_config --template="index.html" --destination="$data_dir/index.html"
+
+# Add the repository pages
+ynh_add_config --template="repository-next.json" --destination="$data_dir/repository-next.json"
+ynh_add_config --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
+
 
 chmod -R o-rwx "$data_dir"
 chown -R $app:www-data "$data_dir"
