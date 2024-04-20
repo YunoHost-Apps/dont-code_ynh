@@ -13,7 +13,7 @@
       "display-name": "Basic plugin for editing entities",
       "version": "1.0.0",
       "info": {
-        "remote-entry":"https://dont-code.net/plugins/latest/remoteEntry.mjs"
+        "remote-entry":"https://run.dont-code.net/plugins/latest/remoteEntry.mjs"
       },
       "config": {}
     },
@@ -22,7 +22,7 @@
       "display-name": "Additional editors for entity properties",
       "version": "1.0.0",
       "info": {
-        "remote-entry":"https://dont-code.net/plugins/latest/remoteEntry.mjs"
+        "remote-entry":"https://run.dont-code.net/plugins/latest/remoteEntry.mjs"
       },
       "config": {}
     },
@@ -31,7 +31,7 @@
       "display-name": "Plugins to support datasources from Rest API",
       "version": "1.0.0",
       "info": {
-        "remote-entry":"https://dont-code.net/plugin-rest/latest/remoteEntry.mjs"
+        "remote-entry":"https://run.dont-code.net/plugin-rest/latest/remoteEntry.mjs"
       },
       "config": {}
     },
@@ -40,7 +40,7 @@
       "display-name": "Plugins to generate and display reports",
       "version": "1.0.0",
       "info": {
-        "remote-entry":"https://dont-code.net/plugin-report/latest/remoteEntry.mjs"
+        "remote-entry":"https://run.dont-code.net/plugin-report/latest/remoteEntry.mjs"
       },
       "config": {}
     },
@@ -49,7 +49,7 @@
       "display-name": "Plugins to get prices from shops",
       "version": "1.0.0",
       "info": {
-        "remote-entry":"https://dont-code.net/plugin-commerce/latest/remoteEntry.mjs"
+        "remote-entry":"https://run.dont-code.net/plugin-commerce/latest/remoteEntry.mjs"
       },
       "config": {}
     }
