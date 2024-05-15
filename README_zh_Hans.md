@@ -3,7 +3,7 @@
 请勿手动编辑。
 -->
 
-# YunoHost 的 Dont-code Services
+# YunoHost 上的 Dont-code Services
 
 [![集成程度](https://dash.yunohost.org/integration/dont-code.svg)](https://dash.yunohost.org/appci/app/dont-code) ![工作状态](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)
 
@@ -32,7 +32,7 @@ This Yunohost app installs the server part (services + mongo database) needed to
 - As well any documents or images uploaded by users will be backed up
 
 
-**分发版本：** 0.3.1~ynh4
+**分发版本：** 0.3.1~ynh5
 
 **演示：** <https://dont-code.net/apps.html>
 
