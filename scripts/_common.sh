@@ -10,7 +10,7 @@ mongo_version=6.0
 SERVICES_LIST=(ide preview project data)
 
 # List of Mongo databases to manage
-MONGO_DB_LIST=(dontCodeProjects dontCodeDemoProjects dontCodeData dontCodeTestProjects)
+MONGO_DB_LIST=(Projects Data)
 
 # The list of port in the same order than the list of services
 PORT_LIST=("$port_ide" "$port_preview" "$port_project" "$port_data")

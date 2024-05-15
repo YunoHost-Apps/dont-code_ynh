@@ -34,6 +34,16 @@ if [ -z "${public_key+x}" ]; then
     ynh_app_setting_set --app="$app" --key=public_key --value="$public_key"
 fi
 
+# Set default tenant to empty if needed
+if [ -z "${tenant+x}" ]; then
+    tenant=""
+    ynh_app_setting_set --app="$app" --key=tenant --value="$tenant"
+fi
+
+# The .env needs db_password
+new_db_pwd=$(ynh_string_random) # Generate a random password
+db_pwd="${db_pwd:-$new_db_pwd}"
+
 if [[ -n "${document_path:-}" ]]; then
     # Renamed setting key
     document_dir="$document_path"
@@ -66,7 +76,7 @@ if [[ -n "${html_path:-}" ]]; then
 
 fi
 
-# Regenerate the .env file if the document_url was incorrectly set before
+# Recalculate the document_url if it was incorrectly set before
 correct_document_url=$(append_uri "https://${domain}${path}" "docs")
 if [ "$correct_document_url" != "$document_url" ]; then
     ynh_script_progression --message="Updading url for documents" --weight=1
@@ -74,13 +84,6 @@ if [ "$correct_document_url" != "$document_url" ]; then
     document_url=$correct_document_url
     ynh_app_setting_set --app=$app --key=document_url --value=$document_url
 
-    ynh_add_config --template=".env" --destination="$install_dir/.env"
-
-    # FIXME: this should be handled by the core in the future
-    # You may need to use chmod 600 instead of 400,
-    # for example if the app is expected to be able to modify its own config
-    chmod 400 "$install_dir/.env"
-    chown $app:$app "$install_dir/.env"
 fi
 
 #=================================================
@@ -92,6 +95,16 @@ if [ "$upgrade_type" == "UPGRADE_APP" ]; then
 
     # Download, check integrity, uncompress and patch the source from app.src
     ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep ".env .ssh/authorized_keys restart_services.sh"
+
+    # Always update .env
+    ynh_add_config --template=".env" --destination="$install_dir/.env"
+
+    # FIXME: this should be handled by the core in the future
+    # You may need to use chmod 600 instead of 400,
+    # for example if the app is expected to be able to modify its own config
+    chmod 400 "$install_dir/.env"
+    chown $app:$app "$install_dir/.env"
+
 fi
 
 chmod -R o-rwx "$install_dir"
@@ -103,6 +116,10 @@ chown -R "$app:$app" "$install_dir"
 ynh_script_progression --message="Configuring document storage..." --weight=1
 
 ynh_add_config --template="index.html" --destination="$data_dir/index.html"
+
+# Add the repository pages
+ynh_add_config --template="repository-next.json" --destination="$data_dir/repository-next.json"
+ynh_add_config --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
 
 chmod -R o-rwx "$data_dir"
 chown -R "$app:www-data" "$data_dir"
@@ -123,6 +140,11 @@ ynh_script_progression --message="Upgrading MongoDB..." --weight=1
 
 # Install the required version of Mongo
 ynh_install_mongo --mongo_version=$mongo_version
+
+# We are now assigning the user to the database, so update the user's rights
+for db_name in "${MONGO_DB_LIST[@]}"; do
+    ynh_mongo_setup_db --db_user="$db_user" --db_pwd="$db_pwd" --db_name="dontCode$tenant${db_name}"
+done
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS

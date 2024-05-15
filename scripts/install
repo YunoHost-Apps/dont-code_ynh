@@ -35,8 +35,13 @@ ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
 document_url=$(append_uri "https://${domain}${path}" "docs")
 ynh_app_setting_set --app="$app" --key=document_url --value="$document_url"
 
-# Add the status page
+# Add the status pageindex
 ynh_add_config --template="index.html" --destination="$data_dir/index.html"
+
+# Add the repository pages
+ynh_add_config --template="repository-next.json" --destination="$data_dir/repository-next.json"
+ynh_add_config --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
+
 
 chmod -R o-rwx "$data_dir"
 chown -R $app:www-data "$data_dir"
@@ -45,6 +50,13 @@ chown -R $app:www-data "$data_dir"
 # ADD A CONFIGURATION
 #=================================================
 ynh_script_progression --message="Adding a configuration file..." --weight=1
+
+# The .env needs db_user and db_password
+new_db_pwd=$(ynh_string_random) # Generate a random password
+db_pwd="${db_pwd:-$new_db_pwd}"
+
+db_user=$(ynh_sanitize_dbid --db_name="${app}")
+ynh_app_setting_set --app="$app" --key=db_user --value="$db_user"
 
 ynh_add_config --template=".env" --destination="$install_dir/.env"
 
@@ -82,12 +94,9 @@ ynh_install_mongo --mongo_version=$mongo_version
 #=================================================
 ynh_script_progression --message="Creating the Mongo databases..." --weight=1
 
-db_user=$(ynh_sanitize_dbid --db_name="${app}")
-ynh_app_setting_set --app="$app" --key=db_user --value="$db_user"
-
-# We should probably enable databases to the user, but for now, we connect through admin
-# No need to create other databases: Mongo creates them on the fly
-ynh_mongo_setup_db --db_user="$db_user" --db_name="${MONGO_DB_LIST[0]}"
+for db_name in "${MONGO_DB_LIST[@]}"; do
+    ynh_mongo_setup_db --db_user="$db_user" --db_pwd="$db_pwd" --db_name="dontCode$tenant${db_name}"
+done
 
 #=================================================
 # SYSTEM CONFIGURATION

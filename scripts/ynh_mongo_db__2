@@ -1,7 +1,7 @@
 #!/bin/bash
 
-readonly YNH_DEFAULT_MONGO_VERSION=4.4
-# Declare the actual MongoDB version to use: 4.4 ; 5.0 ; 6.0
+readonly YNH_DEFAULT_MONGO_VERSION=6.0
+# Declare the actual MongoDB version to use: 4.4 ; 5.0 ; 6.0 ; 7.0
 # A packager willing to use another version of MongoDB can override the variable into its _common.sh.
 YNH_MONGO_VERSION=${YNH_MONGO_VERSION:-$YNH_DEFAULT_MONGO_VERSION}
 
@@ -316,17 +316,13 @@ ynh_install_mongo() {
 	local mongo_debian_release=$(ynh_get_debian_release)
 
 	if [[ $(cat /proc/cpuinfo) != *"avx"* && "$mongo_version" != "4.4" ]]; then
-    #Sadly mongo 4.4 is the only version not requiring avx instruction set, so we will install it
-    ynh_print_warn --message="Installing Mongo 4.4 as $mongo_version is not compatible with your cpu (see https://docs.mongodb.com/manual/administration/production-notes/#x86_64)."
-    mongo_version="4.4"
-  fi
-  if [[ "$mongo_version" == "4.4" && "$mongo_debian_release" != "buster" ]]; then
-    ynh_print_warn --message="Switched to buster install as Mongo 4.4 is not compatible with $mongo_debian_release."
-    mongo_debian_release=buster
-  fi
+		#Sadly mongo 4.4 is the only version not requiring avx instruction set, so we will install it
+		ynh_print_warn --message="Installing Mongo 4.4 as $mongo_version is not compatible with your cpu (see https://docs.mongodb.com/manual/administration/production-notes/#x86_64)."
+		mongo_version="4.4"
+	fi
 
-	ynh_install_extra_app_dependencies --repo="deb http://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" --package="mongodb-org mongodb-org-server mongodb-org-tools mongodb-mongosh" --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
-	mongodb_servicename=mongod
+	ynh_install_extra_app_dependencies --repo="deb http://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" --package="mongodb-org" --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
+  	mongodb_servicename=mongod
 
 	# Make sure MongoDB is started and enabled
 	systemctl enable $mongodb_servicename --quiet
