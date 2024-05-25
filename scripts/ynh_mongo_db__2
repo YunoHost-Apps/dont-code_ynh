@@ -322,6 +322,12 @@ ynh_install_mongo() {
 		mongo_version="4.4"
 	fi
 
+	if [[ "$mongo_version" == "4.4" ]]; then
+    	ynh_print_warn --message="Switching to buster package install for Mongo 4.4."
+    	mongo_debian_release=buster
+    	mongo_packages="mongodb-org-server mongodb-database-tools mongodb-mongosh-shared-openssl11"
+  	fi
+
 	ynh_install_extra_app_dependencies --repo="deb http://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" --package="$mongo_packages" --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
   	mongodb_servicename=mongod
 
