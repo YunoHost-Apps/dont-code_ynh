@@ -7,7 +7,7 @@ name = "Dont-code Services"
 description.en = "Install services and databases needed to support Dont-code platform"
 description.fr = "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
 
-version = "0.3.2~ynh2"
+version = "0.3.2~ynh3"
 
 maintainers = ["Dont-code Team"]
 
@@ -20,7 +20,7 @@ userdoc = "https://dont-code.net/news.html"
 code = "https://github.com/dont-code"
 
 [integration]
-yunohost = ">= 11.1.9"
+yunohost = ">= 11.2"
 architectures = "all"
 multi_instance = true
 ldap = false
@@ -31,11 +31,9 @@ ram.runtime = "400M"
 
 [install]
     [install.domain]
-    # this is a generic question - ask strings are automatically handled by Yunohost's core
     type = "domain"
 
     [install.path]
-    # this is a generic question - ask strings are automatically handled by Yunohost's core
     type = "path"
     default = "/dont-code"
 
