@@ -20,7 +20,7 @@ userdoc = "https://dont-code.net/news.html"
 code = "https://github.com/dont-code"
 
 [integration]
-yunohost = ">= 11.2"
+yunohost = ">= 11.2.12"
 architectures = "all"
 multi_instance = true
 ldap = false
