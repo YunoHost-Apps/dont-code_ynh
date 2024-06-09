@@ -7,7 +7,7 @@ name = "Dont-code Services"
 description.en = "Install services and databases needed to support Dont-code platform"
 description.fr = "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
 
-version = "0.3.2~ynh3"
+version = "0.3.2~ynh4"
 
 maintainers = ["Dont-code Team"]
 
