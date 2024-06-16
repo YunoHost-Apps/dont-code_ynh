@@ -4,7 +4,7 @@
 # COMMON VARIABLES
 #=================================================
 
-mongo_version=6.0
+mongo_version=7.0
 
 # List of services to be installed
 SERVICES_LIST=(ide preview project data)
