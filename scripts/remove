@@ -29,10 +29,6 @@ done
 # Remove the dedicated NGINX config
 ynh_remove_nginx_config
 
-# Remove the app-specific logrotate config
-ynh_remove_logrotate
-
-
 # Remove a database if it exists, along with the associated user
 for db_name in "${MONGO_DB_LIST[@]}"; do
     ynh_mongo_remove_db --db_user=$db_user --db_name="dontCode$tenant$db_name"
