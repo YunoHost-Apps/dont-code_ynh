@@ -38,8 +38,8 @@ This Yunohost app installs the server part (services + mongo database) needed to
 
 ## 截图
 
-![Dont-code Services 的截图](./doc/screenshots/ide.gif)
 ![Dont-code Services 的截图](./doc/screenshots/previewer.gif)
+![Dont-code Services 的截图](./doc/screenshots/ide.gif)
 
 ## 文档与资源
 
