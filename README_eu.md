@@ -38,8 +38,8 @@ This Yunohost app installs the server part (services + mongo database) needed to
 
 ## Pantaila-argazkiak
 
-![Dont-code Services(r)en pantaila-argazkia](./doc/screenshots/previewer.gif)
 ![Dont-code Services(r)en pantaila-argazkia](./doc/screenshots/ide.gif)
+![Dont-code Services(r)en pantaila-argazkia](./doc/screenshots/previewer.gif)
 
 ## Dokumentazioa eta baliabideak
 
