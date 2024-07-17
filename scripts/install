@@ -20,9 +20,6 @@ ynh_setup_source --dest_dir="$install_dir"
 chmod -R o-rwx "$install_dir"
 chown -R "$app:$app" "$install_dir"
 
-mkdir /var/log/$app
-chown "$app:$app" /var/log/$app
-
 #=================================================
 # Configure document storage
 #=================================================
