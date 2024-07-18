@@ -5,7 +5,7 @@ NON debe editarse manualmente.
 
 # Dont-code Services para YunoHost
 
-[![Nivel de integración](https://dash.yunohost.org/integration/dont-code.svg)](https://dash.yunohost.org/appci/app/dont-code) ![Estado de funcionamento](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![Estado de mantemento](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)
+[![Nivel de integración](https://dash.yunohost.org/integration/dont-code.svg)](https://ci-apps.yunohost.org/ci/apps/dont-code/) ![Estado de funcionamento](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![Estado de mantemento](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)
 
 [![Instalar Dont-code Services con YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=dont-code)
 

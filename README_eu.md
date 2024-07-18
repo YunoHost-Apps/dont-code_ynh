@@ -5,7 +5,7 @@ EZ editatu eskuz.
 
 # Dont-code Services YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/dont-code.svg)](https://dash.yunohost.org/appci/app/dont-code) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)
+[![Integrazio maila](https://dash.yunohost.org/integration/dont-code.svg)](https://ci-apps.yunohost.org/ci/apps/dont-code/) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)
 
 [![Instalatu Dont-code Services YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=dont-code)
 
