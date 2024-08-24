@@ -5,7 +5,7 @@
 
 # YunoHost 上的 Dont-code Services
 
-[![集成程度](https://dash.yunohost.org/integration/dont-code.svg)](https://dash.yunohost.org/appci/app/dont-code) ![工作状态](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)
+[![集成程度](https://dash.yunohost.org/integration/dont-code.svg)](https://ci-apps.yunohost.org/ci/apps/dont-code/) ![工作状态](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)
 
 [![使用 YunoHost 安装 Dont-code Services](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=dont-code)
 
@@ -28,11 +28,11 @@ This Yunohost app installs the server part (services + mongo database) needed to
 - By default it provides support for images, currency, text, numbers, countries, links.
 - Multiple plugins allow you to list, edit, make reports, call services, save to database, save in browser, and so on...
 - Plugins can be developed by any IT team
-- Projects and all user's data are backuped up as part of the Yunohost backup process
+- Projects and all user's data are backed up as part of the Yunohost backup process
 - As well any documents or images uploaded by users will be backed up
 
 
-**分发版本：** 0.3.2~ynh5
+**分发版本：** 0.3.2~ynh7
 
 **演示：** <https://dont-code.net/apps.html>
 
