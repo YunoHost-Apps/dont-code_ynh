@@ -1,43 +1,35 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Setting up source files..." --weight=1
+ynh_script_progression "Setting up source files..."
 
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
-chmod -R o-rwx "$install_dir"
-chown -R "$app:$app" "$install_dir"
-
+#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod -R o-rwx "$install_dir"
+#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R "$app:$app" "$install_dir"
 #=================================================
 # Configure document storage
 #=================================================
-ynh_script_progression --message="Configuring document storage..." --weight=1
+ynh_script_progression "Configuring document storage..."
 
 document_dir=$data_dir/docs
-ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
+ynh_app_setting_set --key=document_dir --value="$document_dir"
 
 document_url=$(append_uri "https://${domain}${path}" "docs")
-ynh_app_setting_set --app="$app" --key=document_url --value="$document_url"
+ynh_app_setting_set --key=document_url --value="$document_url"
 
 # Add the status pageindex
-ynh_add_config --template="index.html" --destination="$data_dir/index.html"
+ynh_config_add --template="index.html" --destination="$data_dir/index.html"
 
 # Add the repository pages
-ynh_add_config --template="repository-next.json" --destination="$data_dir/repository-next.json"
-ynh_add_config --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
-
+ynh_config_add --template="repository-next.json" --destination="$data_dir/repository-next.json"
+ynh_config_add --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
 
 chmod -R o-rwx "$data_dir"
 chown -R $app:www-data "$data_dir"
@@ -45,30 +37,30 @@ chown -R $app:www-data "$data_dir"
 #=================================================
 # ADD A CONFIGURATION
 #=================================================
-ynh_script_progression --message="Adding a configuration file..." --weight=1
+ynh_script_progression "Adding $app's configuration..."
 
 # The .env needs db_user and db_password
 new_db_pwd=$(ynh_string_random) # Generate a random password
 db_pwd="${db_pwd:-$new_db_pwd}"
 
 db_user=$(ynh_sanitize_dbid --db_name="${app}")
-ynh_app_setting_set --app="$app" --key=db_user --value="$db_user"
+ynh_app_setting_set --key=db_user --value="$db_user"
 
-ynh_add_config --template=".env" --destination="$install_dir/.env"
+ynh_config_add --template=".env" --destination="$install_dir/.env"
 
-chmod 400 "$install_dir/.env"
-chown $app:$app "$install_dir/.env"
+#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 400 "$install_dir/.env"
+#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown $app:$app "$install_dir/.env"
 
 #=================================================
 # ADD SSH ACCESS
 #=================================================
 
 if [ -n "$public_key" ]; then
-    ynh_script_progression --message="Enabling ssh access for dev..." --weight=1
+    ynh_script_progression "Enabling ssh access for dev..."
     # enable ssh access to the files for updates
     # todo: Secure it more with https://github.com/YunoHost-Apps/ssh_chroot_dir_ynh
     mkdir --parents "$install_dir/.ssh"
-    ynh_add_config --template="authorized_keys" --destination="$install_dir/.ssh/authorized_keys"
+    ynh_config_add --template="authorized_keys" --destination="$install_dir/.ssh/authorized_keys"
 
     chown -R "$app:$app" "$install_dir/.ssh"
     chmod 700 "$install_dir/.ssh"
@@ -80,15 +72,15 @@ fi
 #=================================================
 # INSTALL MONGO
 #=================================================
-ynh_script_progression --message="Installing MongoDB..." --weight=1
+ynh_script_progression "Installing MongoDB..."
 
 # Install the required version of Mongo
-ynh_install_mongo --mongo_version=$mongo_version
+ynh_install_mongo
 
 #=================================================
 # CREATE A MONGO DATABASE
 #=================================================
-ynh_script_progression --message="Creating the Mongo databases..." --weight=1
+ynh_script_progression "Creating the Mongo databases..."
 
 for db_name in "${MONGO_DB_LIST[@]}"; do
     ynh_mongo_setup_db --db_user="$db_user" --db_pwd="$db_pwd" --db_name="dontCode$tenant${db_name}"
@@ -97,33 +89,34 @@ done
 #=================================================
 # SYSTEM CONFIGURATION
 #=================================================
-ynh_script_progression --message="Adding system configurations related to $app..." --weight=1
+ynh_script_progression "Adding system configurations related to $app..."
 
 # Create a dedicated NGINX config
-ynh_add_nginx_config
+ynh_config_add_nginx
 
 # Use logrotate to manage application logfile(s)
-ynh_use_logrotate
+ynh_config_add_logrotate
 
 for i in "${!SERVICES_LIST[@]}"; do
     service_name="${SERVICES_LIST[i]}"
     port="${PORT_LIST[i]}"
-    ynh_add_systemd_config --service="${app}-${service_name}"
+    ynh_config_add_systemd --service="${app}-${service_name}"
     yunohost service add "${app}-${service_name}" --description="Dont-code platform ${service_name} service" --log="/var/log/${app}/${service_name}-${app}.log"
 done
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting systemd services..." --weight=1
+ynh_script_progression "Starting systemd services..."
 
 # Start a systemd service
 for service_name in "${SERVICES_LIST[@]}"; do
-    ynh_systemd_action --service_name="${app}-${service_name}" --action="start" --log_path="/var/log/$app/$app.log"
+    ynh_systemctl --service="${app}-${service_name}" --action="start"
+
 done
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of $app completed" --last
+ynh_script_progression "Installation of $app completed"
