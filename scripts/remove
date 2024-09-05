@@ -17,7 +17,7 @@ done
 
 # Remove the dedicated systemd config
 for service_name in "${SERVICES_LIST[@]}"; do
-    ynh_config_remove_systemd"${app}-${service_name}"
+    ynh_config_remove_systemd "${app}-${service_name}"
 done
 
 # Remove the dedicated NGINX config
