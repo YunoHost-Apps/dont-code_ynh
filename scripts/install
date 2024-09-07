@@ -31,8 +31,7 @@ ynh_config_add --template="index.html" --destination="$data_dir/index.html"
 ynh_config_add --template="repository-next.json" --destination="$data_dir/repository-next.json"
 ynh_config_add --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
 
-chmod -R o-rwx "$data_dir"
-chmod -R g+r "$data_dir"
+chmod -R o-rwx,g+r "$data_dir"
 chown -R $app:www-data "$data_dir"
 
 #=================================================
