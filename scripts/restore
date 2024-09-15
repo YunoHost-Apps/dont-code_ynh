@@ -22,8 +22,8 @@ ynh_restore "$data_dir"
 
 mkdir -p $document_dir
 
-chmod -R o-rwx,g+r "$data_dir"
 chown -R $app:www-data "$data_dir"
+chmod -R o-rwx,gu=rw "$data_dir"
 
 #=================================================
 # ADD SSH ACCESS
