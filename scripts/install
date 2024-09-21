@@ -11,8 +11,6 @@ ynh_script_progression "Setting up source files..."
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod -R o-rwx "$install_dir"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R "$app:$app" "$install_dir"
 #=================================================
 # Configure document storage
 #=================================================
@@ -31,7 +29,8 @@ ynh_config_add --template="index.html" --destination="$data_dir/index.html"
 ynh_config_add --template="repository-next.json" --destination="$data_dir/repository-next.json"
 ynh_config_add --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
 
-chmod -R o-rwx,gu=rw "$data_dir"
+# We need to allow nginx to read the index and docs files
+chmod -R o-rwx,gu+rwx "$data_dir"
 chown -R $app:www-data "$data_dir"
 
 #=================================================
@@ -48,8 +47,8 @@ ynh_app_setting_set --key=db_user --value="$db_user"
 
 ynh_config_add --template=".env" --destination="$install_dir/.env"
 
-#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 400 "$install_dir/.env"
-#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown $app:$app "$install_dir/.env"
+#chmod 400 "$install_dir/.env"
+#chown $app:$app "$install_dir/.env"
 
 #=================================================
 # ADD SSH ACCESS
