@@ -1,37 +1,28 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 # Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# DECLARE DATA AND CONF FILES TO BACKUP
-#=================================================
-ynh_print_info --message="Declaring files to be backed up..."
+ynh_print_info "Declaring files to be backed up..."
 
 #=================================================
 # BACKUP THE APP MAIN DIR
 #=================================================
 
-ynh_backup --src_path="$install_dir"
+ynh_backup "$install_dir"
 
 #=================================================
 # BACKUP THE HTML AND DOCUMENT DIR
 #=================================================
 
-ynh_backup --src_path="$data_dir" --is_big
+ynh_backup "$data_dir"
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
-ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # SPECIFIC BACKUP
@@ -39,27 +30,27 @@ ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 # BACKUP LOGROTATE
 #=================================================
 
-ynh_backup --src_path="/etc/logrotate.d/$app"
+ynh_backup "/etc/logrotate.d/$app"
 
 #=================================================
 # BACKUP SYSTEMD services
 #=================================================
 
 for service_name in "${SERVICES_LIST[@]}"; do
-  ynh_backup --src_path="/etc/systemd/system/${app}-${service_name}.service"
+  ynh_backup "/etc/systemd/system/${app}-${service_name}.service"
 done
 
 #=================================================
 # SPECIFIC BACKUP
 #=================================================
 if [ -n "$public_key" ]; then
-  ynh_backup --src_path="/etc/sudoers.d/$app-sudoers"
+  ynh_backup "/etc/sudoers.d/$app-sudoers"
 fi
 
 #=================================================
 # BACKUP THE MONGO DATABASES
 #=================================================
-ynh_print_info --message="Backing up the Mongo databases..."
+ynh_print_info "Backing up the Mongo databases..."
 
 for db_name in "${MONGO_DB_LIST[@]}"; do
   ynh_mongo_dump_db --database="dontCode$tenant$db_name" > ./dump-dontCode${tenant}${db_name}.bson
@@ -69,4 +60,4 @@ done
 # END OF SCRIPT
 #=================================================
 
-ynh_print_info --message="Backup script completed for $app with tenant $tenant. (YunoHost will then actually copy those files to the archive)."
+ynh_print_info "Backup script completed for $app with tenant $tenant. (YunoHost will then actually copy those files to the archive)."

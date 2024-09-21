@@ -1,42 +1,33 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
-upgrade_type=$(ynh_check_app_version_changed)
-
-#=================================================
-# STANDARD UPGRADE STEPS
 #=================================================
 # STOP SYSTEMD SERVICES
 #=================================================
-ynh_script_progression --message="Stopping systemd services..." --weight=1
+ynh_script_progression "Stopping systemd services..."
 
 for service_name in "${SERVICES_LIST[@]}"; do
-    ynh_systemd_action --service_name="${app}-${service_name}" --action="stop" --log_path="/var/log/$app/$app.log"
+    ynh_systemctl --service="${app}-${service_name}" --action="stop"
+
 done
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+ynh_script_progression "Ensuring downward compatibility..."
 
 # Missing settings ?
 if [ -z "${public_key+x}" ]; then
     public_key=""
-    ynh_app_setting_set --app="$app" --key=public_key --value="$public_key"
+    ynh_app_setting_set --key=public_key --value="$public_key"
 fi
 
 # Set default tenant to empty if needed
 if [ -z "${tenant+x}" ]; then
     tenant=""
-    ynh_app_setting_set --app="$app" --key=tenant --value="$tenant"
+    ynh_app_setting_set --key=tenant --value="$tenant"
 fi
 
 # The .env needs db_password
@@ -46,8 +37,8 @@ db_pwd="${db_pwd:-$new_db_pwd}"
 if [[ -n "${document_path:-}" ]]; then
     # Renamed setting key
     document_dir="$document_path"
-    ynh_app_setting_delete --app="$app" --key=document_path
-    ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
+    ynh_app_setting_delete --key=document_path
+    ynh_app_setting_set --key=document_dir --value="$document_dir"
 fi
 
 if [[ -n "${html_path:-}" ]]; then
@@ -55,33 +46,33 @@ if [[ -n "${html_path:-}" ]]; then
     # document dir has moved from html_path to data_dir, so set the variable accordingly
     if [[ ${document_dir} == ${html_path}* ]]; then
         document_dir=$data_dir/docs
-        ynh_app_setting_set --app="$app" --key=document_dir --value="$document_dir"
+        ynh_app_setting_set --key=document_dir --value="$document_dir"
     fi
 
     # Migrate html_path to data_dir
     mv "$html_path/index.html" "$html_path/docs" "$data_dir"
     old_doc_dir="$html_path/docs"
-    ynh_secure_remove --file="$html_path"
-    ynh_app_setting_delete --app="$app" --key=html_path
+    ynh_safe_rm "$html_path"
+    ynh_app_setting_delete --key=html_path
     # FIXME: other settings
 
     chmod -R o-rwx "$data_dir"
     chown -R "$app:www-data" "$data_dir"
 
     # Update the path in .env file
-    ynh_backup_if_checksum_is_different --file="$install_dir/.env"
-    ynh_replace_string --match_string="$old_doc_dir" --replace_string="$document_dir" --target_file="$install_dir/.env"
-    ynh_store_file_checksum --file="$install_dir/.env"
+    ynh_backup_if_checksum_is_different "$install_dir/.env"
+    ynh_replace --match="$old_doc_dir" --replace="$document_dir" --file="$install_dir/.env"
+    ynh_store_file_checksum "$install_dir/.env"
 
 fi
 
 # Recalculate the document_url if it was incorrectly set before
 correct_document_url=$(append_uri "https://${domain}${path}" "docs")
 if [ "$correct_document_url" != "$document_url" ]; then
-    ynh_script_progression --message="Updading url for documents" --weight=1
+    ynh_script_progression "Updading url for documents"
     old_doc_url=$document_url
     document_url=$correct_document_url
-    ynh_app_setting_set --app=$app --key=document_url --value=$document_url
+    ynh_app_setting_set --key=document_url --value=$document_url
 
 fi
 
@@ -89,56 +80,48 @@ fi
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]; then
-    ynh_script_progression --message="Upgrading source files..." --weight=1
+ynh_script_progression "Upgrading source files..."
 
-    # Download, check integrity, uncompress and patch the source from app.src
-    ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep ".env .ssh/authorized_keys restart_services.sh"
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$install_dir" --full_replace --keep ".env .ssh/authorized_keys restart_services.sh"
 
-    # Always update .env
-    ynh_add_config --template=".env" --destination="$install_dir/.env"
+# Always update .env
+ynh_config_add --template=".env" --destination="$install_dir/.env"
 
-    # FIXME: this should be handled by the core in the future
-    # You may need to use chmod 600 instead of 400,
-    # for example if the app is expected to be able to modify its own config
-    chmod 400 "$install_dir/.env"
-    chown $app:$app "$install_dir/.env"
-
-fi
-
-chmod -R o-rwx "$install_dir"
-chown -R "$app:$app" "$install_dir"
+#chmod 400 "$install_dir/.env"
+#chown $app:$app "$install_dir/.env"
 
 #=================================================
 # Configure document storage
 #=================================================
-ynh_script_progression --message="Configuring document storage..." --weight=1
+ynh_script_progression "Configuring document storage..."
 
-ynh_add_config --template="index.html" --destination="$data_dir/index.html"
+ynh_config_add --template="index.html" --destination="$data_dir/index.html"
 
 # Add the repository pages
-ynh_add_config --template="repository-next.json" --destination="$data_dir/repository-next.json"
-ynh_add_config --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
+ynh_config_add --template="repository-next.json" --destination="$data_dir/repository-next.json"
+ynh_config_add --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
 
-chmod -R o-rwx "$data_dir"
-chown -R "$app:www-data" "$data_dir"
+# We need to allow nginx to read the index and docs files
+chmod -R o-rwx,gu+rwx "$data_dir"
+chown -R $app:www-data "$data_dir"
 
 #=================================================
 # ADD SSH ACCESS
 #=================================================
 
 if [ -n "$public_key" ]; then
-    ynh_script_progression --message="Upgrading ssh access for dev..." --weight=1
+    ynh_script_progression "Upgrading ssh access for dev..."
     _install_restart_script_and_sudoers
 fi
 
 #=================================================
 # UPGRADE MongoDB
 #=================================================
-ynh_script_progression --message="Upgrading MongoDB..." --weight=1
+ynh_script_progression "Upgrading MongoDB..."
 
 # Install the required version of Mongo
-ynh_install_mongo --mongo_version=$mongo_version
+ynh_install_mongo
 
 # We are now assigning the user to the database, so update the user's rights
 for db_name in "${MONGO_DB_LIST[@]}"; do
@@ -148,30 +131,31 @@ done
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
+ynh_script_progression "Upgrading system configurations related to $app..."
 
-ynh_add_nginx_config
+ynh_config_add_nginx
 
-ynh_use_logrotate --non-append
+ynh_config_add_logrotate
 
 for i in "${!SERVICES_LIST[@]}"; do
     service_name="${SERVICES_LIST[i]}"
     port="${PORT_LIST[i]}"
-    ynh_add_systemd_config --service="${app}-${service_name}"
+    ynh_config_add_systemd --service="${app}-${service_name}"
     yunohost service add "${app}-${service_name}" --description="Dont-code platform ${service_name} service" --log="/var/log/${app}/${service_name}-${app}.log"
 done
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting systemd services..." --weight=1
+ynh_script_progression "Starting systemd services..."
 
 for service_name in "${SERVICES_LIST[@]}"; do
-    ynh_systemd_action --service_name="${app}-${service_name}" --action="start" --log_path="/var/log/$app/$app.log"
+    ynh_systemctl --service="${app}-${service_name}" --action="start"
+
 done
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression "Upgrade of $app completed"
