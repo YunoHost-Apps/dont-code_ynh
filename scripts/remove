@@ -31,9 +31,6 @@ for db_name in "${MONGO_DB_LIST[@]}"; do
     ynh_mongo_remove_db --db_user=$db_user --db_name="dontCode$tenant$db_name"
 done
 
-# Remove mongo itself if not used anymore
-ynh_remove_mongo
-
 _remove_restart_script_and_sudoers
 
 #=================================================
