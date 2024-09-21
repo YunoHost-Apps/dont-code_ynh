@@ -46,7 +46,7 @@ This Yunohost app installs the server part (services + mongo database) needed to
 - Website aplikasi resmi: <https://dont-code.net>
 - Dokumentasi pengguna resmi: <https://dont-code.net/news.html>
 - Dokumentasi admin resmi: <https://dont-code.net/developers.html>
-- Repositori kode aplikasi hulu: <https://github.com/dont-code>
+- Depot kode aplikasi hulu: <https://github.com/dont-code>
 - Gudang YunoHost: <https://apps.yunohost.org/app/dont-code>
 - Laporkan bug: <https://github.com/YunoHost-Apps/dont-code_ynh/issues>
 
