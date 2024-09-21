@@ -15,9 +15,11 @@ ynh_restore "$install_dir"
 #chmod 400 "$install_dir/.env"
 #chown $app:$app "$install_dir/.env"
 
-chown -R "$app:$app" "$install_dir/.ssh"
-chmod 700 "$install_dir/.ssh"
-chmod 600 "$install_dir/.ssh/authorized_keys"
+if [[ -d "$install_dir/.ssh" ]]; then
+    chown -R "$app:$app" "$install_dir/.ssh"
+    chmod 700 "$install_dir/.ssh"
+    chmod 600 "$install_dir/.ssh/authorized_keys"
+fi
 
 #=================================================
 # RESTORE THE DOCUMENTS DIRECTORY
