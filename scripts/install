@@ -2,6 +2,7 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
+source _mongo_helper.sh  #Override old helpers
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
