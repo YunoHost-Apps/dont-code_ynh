@@ -36,8 +36,6 @@ _install_restart_script_and_sudoers() {
 
     # Add sudoers file for this specific command
     ynh_config_add --template="dont-code-sudoers" --destination="/etc/sudoers.d/$app-sudoers"
-    #REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown root:root "/etc/sudoers.d/$app-sudoers"
-    #REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod o-rwx,gu=r "/etc/sudoers.d/$app-sudoers"
 }
 
 _remove_restart_script_and_sudoers() {
