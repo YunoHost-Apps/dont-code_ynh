@@ -10,7 +10,6 @@ ynh_script_progression "Stopping systemd services..."
 
 for service_name in "${SERVICES_LIST[@]}"; do
     ynh_systemctl --service="${app}-${service_name}" --action="stop"
-
 done
 
 #=================================================
@@ -20,8 +19,6 @@ ynh_script_progression "Updating NGINX web server configuration..."
 
 ynh_config_change_url_nginx
 
-#=================================================
-# SPECIFIC MODIFICATIONS
 #=================================================
 # Update document url in .env
 #=================================================
@@ -45,7 +42,6 @@ ynh_script_progression "Starting systemd services..."
 
 for service_name in "${SERVICES_LIST[@]}"; do
     ynh_systemctl --service="${app}-${service_name}" --action="start"
-
 done
 
 #=================================================
