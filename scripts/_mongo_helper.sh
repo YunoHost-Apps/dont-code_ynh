@@ -225,6 +225,8 @@ ynh_install_mongo() {
     ynh_print_info "Installing MongoDB Community Edition ..."
     local mongo_debian_release=$YNH_DEBIAN_VERSION
 
+    ynh_print_info --message="$(grep '^flags' /proc/cpuinfo | uniq)"
+
     if [[ "$(grep '^flags' /proc/cpuinfo | uniq)" != *"avx"* && "$mongo_version" != "4.4" ]]; then
         ynh_print_warn "Installing Mongo 4.4 as $mongo_version is not compatible with your cpu (see https://docs.mongodb.com/manual/administration/production-notes/#x86_64)."
         mongo_version="4.4"
