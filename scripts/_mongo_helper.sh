@@ -227,15 +227,6 @@ ynh_install_mongo() {
 
     ynh_print_info --message="$(grep '^flags' /proc/cpuinfo | uniq)"
 
-    if [[ "$(grep '^flags' /proc/cpuinfo | uniq)" != *"avx"* && "$mongo_version" != "4.4" ]]; then
-        ynh_print_warn "Installing Mongo 4.4 as $mongo_version is not compatible with your cpu (see https://docs.mongodb.com/manual/administration/production-notes/#x86_64)."
-        mongo_version="4.4"
-    fi
-    if [[ "$mongo_version" == "4.4" ]]; then
-        ynh_print_warn "Switched to buster install as Mongo 4.4 is not compatible with $mongo_debian_release."
-        mongo_debian_release=buster
-    fi
-
     if [[ "$mongo_debian_release" == "bookworm" && "$mongo_version" != "7."* ]]; then
         ynh_print_warn --message="Switched to Mongo v7 as $mongo_version is not compatible with $mongo_debian_release"
         mongo_version = "7.0"
