@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
@@ -54,7 +53,6 @@ fi
 #=================================================
 ynh_script_progression "Reinstalling MongoDB..."
 
-# Install the required version of Mongo
 ynh_install_mongo
 
 #=================================================
@@ -90,7 +88,6 @@ ynh_script_progression "Reloading NGINX web server and $app's services..."
 
 for service_name in "${SERVICES_LIST[@]}"; do
     ynh_systemctl --service="${app}-${service_name}" --action="start"
-
 done
 
 ynh_systemctl --service=nginx --action=reload

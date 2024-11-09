@@ -28,11 +28,11 @@ This Yunohost app installs the server part (services + mongo database) needed to
 - By default it provides support for images, currency, text, numbers, countries, links.
 - Multiple plugins allow you to list, edit, make reports, call services, save to database, save in browser, and so on...
 - Plugins can be developed by any IT team
-- Projects and all user's data are backuped up as part of the Yunohost backup process
+- Projects and all user's data are backed up as part of the Yunohost backup process
 - As well any documents or images uploaded by users will be backed up
 
 
-**Geleverde versie:** 0.3.2~ynh7
+**Geleverde versie:** 0.3.2~ynh8
 
 **Demo:** <https://dont-code.net/apps.html>
 

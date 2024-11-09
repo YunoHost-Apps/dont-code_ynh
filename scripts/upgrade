@@ -10,7 +10,6 @@ ynh_script_progression "Stopping systemd services..."
 
 for service_name in "${SERVICES_LIST[@]}"; do
     ynh_systemctl --service="${app}-${service_name}" --action="stop"
-
 done
 
 #=================================================
@@ -63,7 +62,6 @@ if [[ -n "${html_path:-}" ]]; then
     ynh_backup_if_checksum_is_different "$install_dir/.env"
     ynh_replace --match="$old_doc_dir" --replace="$document_dir" --file="$install_dir/.env"
     ynh_store_file_checksum "$install_dir/.env"
-
 fi
 
 # Recalculate the document_url if it was incorrectly set before
@@ -73,16 +71,13 @@ if [ "$correct_document_url" != "$document_url" ]; then
     old_doc_url=$document_url
     document_url=$correct_document_url
     ynh_app_setting_set --key=document_url --value=$document_url
-
 fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-
 ynh_script_progression "Upgrading source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir" --full_replace --keep ".env .ssh/authorized_keys restart_services.sh"
 
 # Always update .env
@@ -120,7 +115,6 @@ fi
 #=================================================
 ynh_script_progression "Upgrading MongoDB..."
 
-# Install the required version of Mongo
 ynh_install_mongo
 
 # We are now assigning the user to the database, so update the user's rights
@@ -151,7 +145,6 @@ ynh_script_progression "Starting systemd services..."
 
 for service_name in "${SERVICES_LIST[@]}"; do
     ynh_systemctl --service="${app}-${service_name}" --action="start"
-
 done
 
 #=================================================
