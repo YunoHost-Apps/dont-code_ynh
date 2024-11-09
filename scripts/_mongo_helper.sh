@@ -225,8 +225,6 @@ ynh_install_mongo() {
     ynh_print_info "Installing MongoDB Community Edition ..."
     local mongo_debian_release=$YNH_DEBIAN_VERSION
 
-    ynh_print_info --message="$(grep '^flags' /proc/cpuinfo | uniq)"
-
     if [[ "$mongo_debian_release" == "bookworm" && "$mongo_version" != "7."* ]]; then
         ynh_print_warn --message="Switched to Mongo v7 as $mongo_version is not compatible with $mongo_debian_release"
         mongo_version = "7.0"
