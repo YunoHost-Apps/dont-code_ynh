@@ -2,13 +2,13 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
+source _mongo_helper.sh  #Override old helpers
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression "Setting up source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
 #=================================================
@@ -90,10 +90,8 @@ done
 #=================================================
 ynh_script_progression "Adding system configurations related to $app..."
 
-# Create a dedicated NGINX config
 ynh_config_add_nginx
 
-# Use logrotate to manage application logfile(s)
 ynh_config_add_logrotate
 
 for i in "${!SERVICES_LIST[@]}"; do
@@ -108,10 +106,8 @@ done
 #=================================================
 ynh_script_progression "Starting systemd services..."
 
-# Start a systemd service
 for service_name in "${SERVICES_LIST[@]}"; do
     ynh_systemctl --service="${app}-${service_name}" --action="start"
-
 done
 
 #=================================================
