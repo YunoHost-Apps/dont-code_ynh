@@ -32,7 +32,7 @@ This Yunohost app installs the server part (services + mongo database) needed to
 - As well any documents or images uploaded by users will be backed up
 
 
-**Поставляемая версия:** 0.3.2~ynh8
+**Поставляемая версия:** 0.3.2~ynh9
 
 **Демо-версия:** <https://dont-code.net/apps.html>
 

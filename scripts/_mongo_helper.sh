@@ -211,6 +211,26 @@ ynh_mongo_remove_db() {
     ynh_mongo_drop_user --db_user=$db_user --db_name=$db_name
 }
 
+_package_is_installed() {
+    # Declare an array to define the options of this helper.
+    local legacy_args=p
+    local -A args_array=([p]=package=)
+    local package
+    # Manage arguments with getopts
+    ynh_handle_getopts_args "$@"
+
+    dpkg-query --show --showformat='${Status}' "$package" 2> /dev/null \
+        | grep --count "ok installed" &> /dev/null
+}
+
+ynh_installed_mongo_version() {
+    if _package_is_installed --package "mongodb-org-server"; then
+        dpkg-query --show --showformat='${Version}' "mongodb-org-server" 2> /dev/null
+    else
+        echo ''
+    fi
+}
+
 # Install MongoDB and integrate MongoDB service in YunoHost
 # It can upgrade / downgrade the desired mongo version to ensure a compatible one is installed
 #
@@ -223,16 +243,22 @@ ynh_install_mongo() {
     [[ -n "${mongo_version:-}" ]] || ynh_die "\$mongo_version should be defined prior to calling ynh_install_mongo"
 
     ynh_print_info "Installing MongoDB Community Edition ..."
+
+    
+    if [[ "$(grep '^flags' /proc/cpuinfo | uniq)" != *"avx"* && "$mongo_version" != "4.4" ]]; then
+        ynh_die "Mongo $mongo_version is not compatible with your cpu (see https://docs.mongodb.com/manual/administration/production-notes/#x86_64)."
+    fi
+
     local mongo_debian_release=$YNH_DEBIAN_VERSION
 
     if [[ "$mongo_debian_release" == "bookworm" && "$mongo_version" != "7."* ]]; then
-        ynh_print_warn --message="Switched to Mongo v7 as $mongo_version is not compatible with $mongo_debian_release"
+        ynh_print_warn "Switched to Mongo v7 as $mongo_version is not compatible with $mongo_debian_release"
         mongo_version = "7.0"
     fi
 
     # Check if MongoDB is already installed
     local install_package=true
-    local current_version=$(ynh_package_version --package="mongodb-org-server")
+    local current_version=$(ynh_installed_mongo_version)
     # Focus only the major, minor versions
     current_version=$(cut -c 1-3 <<< "$current_version")
 
@@ -241,13 +267,12 @@ ynh_install_mongo() {
             if (($(bc <<< "scale = 0 ; x = $mongo_version / 1 - $current_version / 1; x > 1.0"))); then
                 # Mongo only support upgrading a major version to another
                 ynh_die "Upgrading Mongo from version  $current_version to $mongo_version is not supported"
-                install_package=false
             else
-                ynh_print_info --message="Upgrading Mongo from version $current_version to $mongo_version"
+                ynh_print_warn "Upgrading Mongo from version $current_version to $mongo_version"
             fi
         else
             if (($(bc <<< "$current_version >= $mongo_version"))); then
-                ynh_print_warn --message="Mongo version $current_version is already installed and will be kept instead of requested version $mongo_version"
+                ynh_print_info "Mongo version $current_version is already installed and will be kept instead of requested version $mongo_version"
                 install_package=false
             fi
         fi
