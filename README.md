@@ -5,7 +5,9 @@ It shall NOT be edited by hand.
 
 # Dont-code Services for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/dont-code.svg)](https://ci-apps.yunohost.org/ci/apps/dont-code/) ![Working status](https://ci-apps.yunohost.org/ci/badges/dont-code.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/dont-code.maintain.svg)
+[![Integration level](https://apps.yunohost.org/badge/integration/dont-code)](https://ci-apps.yunohost.org/ci/apps/dont-code/)
+![Working status](https://apps.yunohost.org/badge/state/dont-code)
+![Maintenance status](https://apps.yunohost.org/badge/maintained/dont-code)
 
 [![Install Dont-code Services with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=dont-code)
 
@@ -32,7 +34,7 @@ This Yunohost app installs the server part (services + mongo database) needed to
 - As well any documents or images uploaded by users will be backed up
 
 
-**Shipped version:** 0.3.2~ynh9
+**Shipped version:** 0.3.3~ynh1
 
 **Demo:** <https://dont-code.net/apps.html>
 
