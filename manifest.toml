@@ -50,6 +50,13 @@ ram.runtime = "400M"
     type = "string"
     optional = true
 
+    [install.mistral_key]
+    ask.en = "Enable application generation through prompts by setting your Mistral API Keys here, or NONE to disable."
+    ask.fr = "En renseignant une clef d'API Mistral, vous avez la possibilité de générer une application avec un simple prompt, inactif avec la valeur NONE."
+    type = "string"
+    optional = false
+    default = "NONE"
+
     [install.init_main_permission]
     type = "group"
     default = "visitors"
@@ -86,11 +93,3 @@ ram.runtime = "400M"
     packages = [
         "",
     ]
-
-    packages_from_raw_bash = """
-    if [[ $YNH_DEBIAN_VERSION == "bookworm" ]]; then
-        echo "openjdk-17-jre";
-    elif [[ $YNH_DEBIAN_VERSION == "trixie" ]]; then
-        echo "openjdk-21-jre";
-    fi
-    """

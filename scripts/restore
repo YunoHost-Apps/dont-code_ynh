@@ -49,8 +49,12 @@ if [ -n "$public_key" ]; then
 fi
 
 #=================================================
-# INSTALL MONGO
+# INSTALL SUPPORTING TOOLS
 #=================================================
+ynh_script_progression "Setting up Java..."
+
+_install_java
+
 ynh_script_progression "Reinstalling MongoDB..."
 
 ynh_install_mongo

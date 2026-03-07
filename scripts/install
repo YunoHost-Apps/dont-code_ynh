@@ -11,6 +11,7 @@ ynh_script_progression "Setting up source files..."
 
 ynh_setup_source --dest_dir="$install_dir"
 
+
 #=================================================
 # Configure document storage
 #=================================================
@@ -69,8 +70,12 @@ if [ -n "$public_key" ]; then
 fi
 
 #=================================================
-# INSTALL MONGO
+# INSTALL SUPPORTING TOOLS
 #=================================================
+ynh_script_progression "Setting up Java..."
+
+_install_java
+
 ynh_script_progression "Installing MongoDB..."
 
 # Install the required version of Mongo
