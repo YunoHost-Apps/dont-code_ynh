@@ -244,16 +244,24 @@ ynh_install_mongo() {
 
     ynh_print_info "Installing MongoDB Community Edition ..."
 
-    
+
     if [[ "$(grep '^flags' /proc/cpuinfo | uniq)" != *"avx"* && "$mongo_version" != "4.4" ]]; then
         ynh_die "Mongo $mongo_version is not compatible with your cpu (see https://docs.mongodb.com/manual/administration/production-notes/#x86_64)."
     fi
 
     local mongo_debian_release=$YNH_DEBIAN_VERSION
+    if [[ "$mongo_debian_release" == "bookworm" ]]; then
+      if [[ "$mongo_version" != "8."* && "$mongo_version" != "7."* ]]; then
+          ynh_print_warn "Switched to Mongo v8 as $mongo_version is not compatible with $mongo_debian_release"
+          mongo_version="8.0"
+      fi
+    fi
 
-    if [[ "$mongo_debian_release" == "bookworm" && "$mongo_version" != "7."* ]]; then
-        ynh_print_warn "Switched to Mongo v7 as $mongo_version is not compatible with $mongo_debian_release"
-        mongo_version = "7.0"
+    if [[ "$mongo_debian_release" == "trixie" ]]; then
+      if [[ "$mongo_version" == "7."* ]]; then
+          ynh_print_warn "Switched to Mongo v8 as $mongo_version is not compatible with $mongo_debian_release"
+          mongo_version="8.0"
+      fi
     fi
 
     # Check if MongoDB is already installed
@@ -272,7 +280,7 @@ ynh_install_mongo() {
             fi
         else
             if (($(bc <<< "$current_version >= $mongo_version"))); then
-                ynh_print_info "Mongo version $current_version is already installed and will be kept instead of requested version $mongo_version"
+                ynh_print_info "Mongo version $current_version is already installed and will be kept."
                 install_package=false
             fi
         fi
@@ -280,7 +288,7 @@ ynh_install_mongo() {
 
     if [[ "$install_package" = true ]]; then
         ynh_apt_install_dependencies_from_extra_repository \
-            --repo="deb http://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" \
+            --repo="deb https://repo.mongodb.org/apt/debian $mongo_debian_release/mongodb-org/$mongo_version main" \
             --package="mongodb-org mongodb-org-server mongodb-org-tools mongodb-mongosh" \
             --key="https://www.mongodb.org/static/pgp/server-$mongo_version.asc"
     fi

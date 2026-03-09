@@ -73,6 +73,12 @@ if [ "$correct_document_url" != "$document_url" ]; then
     ynh_app_setting_set --key=document_url --value=$document_url
 fi
 
+# Missing mistral API key
+if [ -z "${mistral_key+x}" ]; then
+    mistral_key="NONE"
+    ynh_app_setting_set --key=mistral_key --value="$mistral_key"
+fi
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
@@ -111,8 +117,12 @@ if [ -n "$public_key" ]; then
 fi
 
 #=================================================
-# UPGRADE MongoDB
+# UPGRADE SUPPORTING TOOLS
 #=================================================
+ynh_script_progression "Upgrading Java..."
+
+_install_java
+
 ynh_script_progression "Upgrading MongoDB..."
 
 ynh_install_mongo

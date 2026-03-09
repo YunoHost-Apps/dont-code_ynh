@@ -7,7 +7,7 @@ name = "Dont-code Services"
 description.en = "Install services and databases needed to support Dont-code platform"
 description.fr = "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
 
-version = "0.3.3~ynh1"
+version = "0.4.1~ynh1"
 
 maintainers = ["Dont-code Team"]
 
@@ -20,7 +20,7 @@ userdoc = "https://dont-code.net/news.html"
 code = "https://github.com/dont-code"
 
 [integration]
-yunohost = ">= 11.2.30"
+yunohost = ">= 12.1.38"
 helpers_version = "2.1"
 architectures = "all"
 multi_instance = true
@@ -50,14 +50,21 @@ ram.runtime = "400M"
     type = "string"
     optional = true
 
+    [install.mistral_key]
+    ask.en = "Enable application generation through prompts by setting your Mistral API Keys here, or NONE to disable."
+    ask.fr = "En renseignant une clef d'API Mistral, vous avez la possibilité de générer une application avec un simple prompt, inactif avec la valeur NONE."
+    type = "string"
+    optional = false
+    default = "NONE"
+
     [install.init_main_permission]
     type = "group"
     default = "visitors"
 
 [resources]
     [resources.sources.main]
-    url = "https://github.com/dont-code/release/releases/download/v0.3.3/dont-code-release-runners.zip"
-    sha256 = "988db24dbdccb7027c7d08203eda255afc70be0c7c58aaa5c7c59aaf3647471e"
+    url = "https://github.com/dont-code/release/releases/download/v0.4.1/dont-code-release-runners.zip"
+    sha256 = "26679ec8289c3afd53564e2b48566df7e03dd3bf9bb524d277fd2f8a5220a087"
     in_subdir = false
     autoupdate.strategy = "latest_github_release"
     autoupdate.asset = "dont-code-release-runners.zip"
@@ -84,5 +91,5 @@ ram.runtime = "400M"
 
     [resources.apt]
     packages = [
-        "openjdk-17-jre",
+        "",
     ]
