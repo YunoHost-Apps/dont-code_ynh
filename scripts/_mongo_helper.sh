@@ -258,10 +258,14 @@ ynh_install_mongo() {
     fi
 
     if [[ "$mongo_debian_release" == "trixie" ]]; then
+      # Trixie only supports Mongo 8.0
       if [[ "$mongo_version" == "7."* ]]; then
           ynh_print_warn "Switched to Mongo v8 as $mongo_version is not compatible with $mongo_debian_release"
           mongo_version="8.0"
       fi
+      # No trixie package from Mongo yet, so revert to the bookworm package. Removes this when Mongo releases a package for Trixie
+      ynh_print_warn "Using Bookworm package until Mongo provides a package for Trixie"
+      mongo_debian_release="bookworm"
     fi
 
     # Check if MongoDB is already installed
@@ -285,6 +289,7 @@ ynh_install_mongo() {
             fi
         fi
     fi
+
 
     if [[ "$install_package" = true ]]; then
         ynh_apt_install_dependencies_from_extra_repository \
