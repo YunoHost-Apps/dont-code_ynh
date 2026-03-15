@@ -18,7 +18,7 @@ PORT_LIST=("$port_ide" "$port_preview" "$port_project" "$port_data")
 java_version=25
 
 _java_path () {
-    if [[ "$debian_release" == "trixie" ]]; then
+    if [[ "$YNH_DEBIAN_VERSION" == "trixie" ]]; then
         echo "/usr/lib/jvm/java-${java_version}-openjdk-amd64/bin/java"
     else
         echo "/usr/lib/jvm/temurin-${java_version}-jre-amd64/bin/java"
