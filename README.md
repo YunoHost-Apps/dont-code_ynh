@@ -12,7 +12,7 @@ Install services and databases needed to support Dont-code platform
 
 [![🌐 Official app website](https://img.shields.io/badge/Official_app_website-darkgreen?style=for-the-badge)](https://dont-code.net)
 [![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)](https://dont-code.net/apps.html)
-[![Version: 0.4.2~ynh1](https://img.shields.io/badge/Version-0.4.2~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/dont-code/)
+[![Version: 0.4.3~ynh1](https://img.shields.io/badge/Version-0.4.3~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/dont-code/)
 
 <div align="center">
 <a href="https://apps.yunohost.org/app/dont-code"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
