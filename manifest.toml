@@ -64,7 +64,7 @@ ram.runtime = "400M"
 [resources]
     [resources.sources.main]
     url = "https://github.com/dont-code/release/releases/download/v0.4.5/dont-code-release-runners.zip"
-    sha256 = "4b6ab0eade034c54a11cc1e89a1add869caf9ad2be41704cf538b284d57e194b"
+    sha256 = "4f8088d2f9fc065d51ab9ab6a19889d28156f797aac77ed07390a6d65375d5f5"
     in_subdir = false
     autoupdate.strategy = "latest_github_release"
     autoupdate.asset = "dont-code-release-runners.zip"
