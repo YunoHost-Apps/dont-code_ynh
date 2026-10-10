@@ -22,7 +22,7 @@ code = "https://github.com/dont-code"
 [integration]
 yunohost = ">= 12.1.38"
 helpers_version = "2.1"
-architectures = "amd64"
+architectures = ["amd64"]
 multi_instance = true
 ldap = false
 sso = false
