@@ -7,7 +7,7 @@ name = "Dont-code Services"
 description.en = "Install services and databases needed to support Dont-code platform"
 description.fr = "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
 
-version = "0.4.5~ynh3"
+version = "0.4.5~ynh4"
 
 maintainers = ["Dont-code Team"]
 
@@ -22,7 +22,7 @@ code = "https://github.com/dont-code"
 [integration]
 yunohost = ">= 12.1.38"
 helpers_version = "2.1"
-architectures = "all"
+architectures = ["amd64"]
 multi_instance = true
 ldap = false
 sso = false
