@@ -9,17 +9,13 @@ User=__APP__
 Group=__APP__
 Environment="quarkus_http_port=__PORT__"
 WorkingDirectory=__INSTALL_DIR__/
-ExecStart=__YNH_JAVA__ -jar __SERVICE_NAME__-services-runner.jar
+ExecStart=__YNH_JAVA__ -jar __INSTALL_DIR__/services/__SERVICE_NAME__-services.jar
 StandardOutput=append:/var/log/__APP__/__SERVICE_NAME__-__APP__.log
 StandardError=inherit
 
 # Sandboxing options to harden security
-# Depending on specificities of your service/app, you may need to tweak these
-# .. but this should be a good baseline
 # Details for these options: https://www.freedesktop.org/software/systemd/man/systemd.exec.html
-
-# Enable the writing of uploaded documents
-ReadWritePaths=__DOCUMENT_DIR__
+ReadWritePaths=__DOCUMENT_DIR__ __DATA_DIR__ __INSTALL_DIR__
 NoNewPrivileges=yes
 PrivateTmp=yes
 PrivateDevices=yes
@@ -39,7 +35,6 @@ SystemCallArchitectures=native
 SystemCallFilter=~@clock @debug @module @mount @obsolete @reboot @setuid @swap @cpu-emulation @privileged
 
 # Denying access to capabilities that should not be relevant for webapps
-# Doc: https://man7.org/linux/man-pages/man7/capabilities.7.html
 CapabilityBoundingSet=~CAP_RAWIO CAP_MKNOD
 CapabilityBoundingSet=~CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_AUDIT_WRITE
 CapabilityBoundingSet=~CAP_SYS_BOOT CAP_SYS_TIME CAP_SYS_MODULE CAP_SYS_PACCT

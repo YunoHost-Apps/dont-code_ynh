@@ -12,7 +12,7 @@ ynh_print_info "Declaring files to be backed up..."
 ynh_backup "$install_dir"
 
 #=================================================
-# BACKUP THE HTML AND DOCUMENT DIR
+# BACKUP THE DATA DIR
 #=================================================
 
 ynh_backup "$data_dir"
@@ -30,7 +30,7 @@ ynh_backup "/etc/logrotate.d/$app"
 #=================================================
 
 for service_name in "${SERVICES_LIST[@]}"; do
-  ynh_backup "/etc/systemd/system/${app}-${service_name}.service"
+    ynh_backup "/etc/systemd/system/${app}-${service_name}.service"
 done
 
 #=================================================
@@ -38,7 +38,7 @@ done
 #=================================================
 
 if [ -n "$public_key" ]; then
-  ynh_backup "/etc/sudoers.d/$app-sudoers"
+    ynh_backup "/etc/sudoers.d/$app-sudoers"
 fi
 
 #=================================================
@@ -47,7 +47,7 @@ fi
 ynh_print_info "Backing up the Mongo databases..."
 
 for db_name in "${MONGO_DB_LIST[@]}"; do
-  ynh_mongo_dump_db --database="dontCode$tenant$db_name" > ./dump-dontCode${tenant}${db_name}.bson
+    ynh_mongo_dump_db --database="dontCode$tenant$db_name" > ./dump-dontCode${tenant}${db_name}.bson
 done
 
 #=================================================

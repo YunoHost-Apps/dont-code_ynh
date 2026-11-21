@@ -8,8 +8,20 @@ source /usr/share/yunohost/helpers
 #=================================================
 ynh_script_progression "Stopping systemd services..."
 
+# Stop current services
 for service_name in "${SERVICES_LIST[@]}"; do
-    ynh_systemctl --service="${app}-${service_name}" --action="stop"
+    ynh_systemctl --service="${app}-${service_name}" --action="stop" || true
+done
+
+# Legacy services from pre-full-suite versions
+for legacy_service in ide preview; do
+    if ynh_hide_warnings yunohost service status "${app}-${legacy_service}" >/dev/null 2>&1; then
+        ynh_systemctl --service="${app}-${legacy_service}" --action="stop" || true
+        yunohost service remove "${app}-${legacy_service}" || true
+    fi
+    if [ -f "/etc/systemd/system/${app}-${legacy_service}.service" ]; then
+        ynh_config_remove_systemd "${app}-${legacy_service}" || true
+    fi
 done
 
 #=================================================
@@ -41,7 +53,6 @@ if [[ -n "${document_path:-}" ]]; then
 fi
 
 if [[ -n "${html_path:-}" ]]; then
-
     # document dir has moved from html_path to data_dir, so set the variable accordingly
     if [[ ${document_dir} == ${html_path}* ]]; then
         document_dir=$data_dir/docs
@@ -49,28 +60,41 @@ if [[ -n "${html_path:-}" ]]; then
     fi
 
     # Migrate html_path to data_dir
-    mv "$html_path/index.html" "$html_path/docs" "$data_dir"
+    if [ -d "$html_path/docs" ]; then
+        mkdir -p "$data_dir"
+        mv "$html_path/docs" "$data_dir/"
+    fi
+    if [ -f "$html_path/index.html" ]; then
+        mkdir -p "$data_dir"
+        mv "$html_path/index.html" "$data_dir/" || true
+    fi
     old_doc_dir="$html_path/docs"
     ynh_safe_rm "$html_path"
     ynh_app_setting_delete --key=html_path
-    # FIXME: other settings
 
-    chmod -R o-rwx "$data_dir"
+    chmod -R o-rwx,gu+rwx "$data_dir"
     chown -R "$app:www-data" "$data_dir"
 
     # Update the path in .env file
-    ynh_backup_if_checksum_is_different "$install_dir/.env"
-    ynh_replace --match="$old_doc_dir" --replace="$document_dir" --file="$install_dir/.env"
-    ynh_store_file_checksum "$install_dir/.env"
+    if [ -f "$install_dir/.env" ]; then
+        ynh_backup_if_checksum_is_different "$install_dir/.env"
+        ynh_replace --match="$old_doc_dir" --replace="$document_dir" --file="$install_dir/.env"
+        ynh_store_file_checksum "$install_dir/.env"
+    fi
 fi
 
-# Recalculate the document_url if it was incorrectly set before
+# Recalculate the document_url
 correct_document_url=$(append_uri "https://${domain}${path}" "docs")
-if [ "$correct_document_url" != "$document_url" ]; then
-    ynh_script_progression "Updading url for documents"
-    old_doc_url=$document_url
+if [ "$correct_document_url" != "${document_url:-}" ]; then
+    ynh_script_progression "Updating url for documents"
     document_url=$correct_document_url
-    ynh_app_setting_set --key=document_url --value=$document_url
+    ynh_app_setting_set --key=document_url --value="$document_url"
+fi
+
+# Ensure document_dir setting exists
+if [ -z "${document_dir:-}" ]; then
+    document_dir=$data_dir/docs
+    ynh_app_setting_set --key=document_dir --value="$document_dir"
 fi
 
 # Missing mistral API key
@@ -84,28 +108,38 @@ fi
 #=================================================
 ynh_script_progression "Upgrading source files..."
 
-ynh_setup_source --dest_dir="$install_dir" --full_replace --keep ".env .ssh/authorized_keys restart_services.sh"
+ynh_setup_source --dest_dir="$install_dir" --full_replace --keep ".ssh/authorized_keys restart-services.sh"
+
+#=================================================
+# CONFIGURE DATA STORAGE
+#=================================================
+ynh_script_progression "Configuring data storage..."
+
+# Move the web pages out of install_dir into data_dir (older installs kept
+# them next to the services) so nginx can deliver them.
+deploy_web_files
+
+test_dir=$data_dir/test
+ynh_app_setting_set --key=test_dir --value="$test_dir"
+mkdir -p "$test_dir"
+ynh_config_add --template="index.html" --destination="$test_dir/index.html"
+
+mkdir -p "$document_dir"
+chmod -R o-rwx,gu+rwx "$data_dir"
+chown -R "$app:www-data" "$data_dir"
+
+#=================================================
+# UPDATE CONFIGURATION
+#=================================================
+ynh_script_progression "Updating $app's configuration..."
 
 # Always update .env
 ynh_config_add --template=".env" --destination="$install_dir/.env"
 
-#chmod 400 "$install_dir/.env"
-#chown $app:$app "$install_dir/.env"
-
-#=================================================
-# Configure document storage
-#=================================================
-ynh_script_progression "Configuring document storage..."
-
-ynh_config_add --template="index.html" --destination="$data_dir/index.html"
-
-# Add the repository pages
-ynh_config_add --template="repository-next.json" --destination="$data_dir/repository-next.json"
-ynh_config_add --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
-
-# We need to allow nginx to read the index and docs files
-chmod -R o-rwx,gu+rwx "$data_dir"
-chown -R $app:www-data "$data_dir"
+# Render dashboard and host runtime configuration for this YunoHost domain/path.
+render_dashboard_config
+render_host_config
+patch_web_base_href
 
 #=================================================
 # ADD SSH ACCESS
@@ -127,7 +161,7 @@ ynh_script_progression "Upgrading MongoDB..."
 
 ynh_install_mongo
 
-# We are now assigning the user to the database, so update the user's rights
+# Ensure DB users/rights
 for db_name in "${MONGO_DB_LIST[@]}"; do
     ynh_mongo_setup_db --db_user="$db_user" --db_pwd="$db_pwd" --db_name="dontCode$tenant${db_name}"
 done
@@ -138,6 +172,9 @@ done
 ynh_script_progression "Upgrading system configurations related to $app..."
 
 ynh_config_add_nginx
+if [ "$path" = "/" ]; then
+    sed -i "s|location //|location /|g; s|__PATH__/|/|g; s|__PATH__|/|g" "/etc/nginx/conf.d/$domain.d/$app.conf"
+fi
 
 ynh_config_add_logrotate
 

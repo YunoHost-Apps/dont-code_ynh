@@ -11,9 +11,6 @@ ynh_script_progression "Restoring the app main directory..."
 ynh_restore "$install_dir"
 
 # Ensure access rights are correct for special files
-#chmod 400 "$install_dir/.env"
-#chown $app:$app "$install_dir/.env"
-
 if [[ -d "$install_dir/.ssh" ]]; then
     chown -R "$app:$app" "$install_dir/.ssh"
     chmod 700 "$install_dir/.ssh"
@@ -21,24 +18,24 @@ if [[ -d "$install_dir/.ssh" ]]; then
 fi
 
 #=================================================
-# RESTORE THE DOCUMENTS DIRECTORY
+# RESTORE THE DATA DIRECTORY
 #=================================================
-ynh_script_progression "Restoring the document storage..."
+ynh_script_progression "Restoring the data directory..."
 
 ynh_restore "$data_dir"
 
-mkdir -p $document_dir
+mkdir -p "$document_dir"
 
-# We need to allow nginx to read the index and docs files
+# We need to allow nginx to read the docs files
 chmod -R o-rwx,gu+rwx "$data_dir"
-chown -R $app:www-data "$data_dir"
+chown -R "$app:www-data" "$data_dir"
 
 #=================================================
 # ADD SSH ACCESS
 #=================================================
 
 # Make sure the .ssh and files have the correct access rights
-if [ -n "$public_key" ]; then
+if [ -n "${public_key:-}" ]; then
     ynh_script_progression "Restoring ssh access for dev..."
 
     chown -R "$app:$app" "$install_dir/.ssh"
@@ -86,7 +83,7 @@ for service_name in "${SERVICES_LIST[@]}"; do
 done
 
 #=================================================
-# RELOAD NGINX AND PHP-FPM OR THE APP SERVICE
+# RELOAD NGINX AND APP SERVICES
 #=================================================
 ynh_script_progression "Reloading NGINX web server and $app's services..."
 

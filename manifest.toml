@@ -3,11 +3,11 @@
 packaging_format = 2
 
 id = "dont-code"
-name = "Dont-code Services"
-description.en = "Install services and databases needed to support Dont-code platform"
-description.fr = "Installe les services et base de données nécessaires pour utiliser la plateforme Dont-code"
+name = "Dont-code"
+description.en = "Low-code/no-code platform with dashboard, project/data services and plugin host"
+description.fr = "Plateforme low-code/no-code avec tableau de bord, services projet/données et hôte de plugins"
 
-version = "0.4.5~ynh4"
+version = "1.5.1~ynh1"
 
 maintainers = ["Dont-code Team"]
 
@@ -26,9 +26,9 @@ architectures = ["amd64"]
 multi_instance = true
 ldap = false
 sso = false
-disk = "50M"
-ram.build = "400M"
-ram.runtime = "400M"
+disk = "1G"
+ram.build = "500M"
+ram.runtime = "1500M"
 
 [install]
     [install.domain]
@@ -39,19 +39,19 @@ ram.runtime = "400M"
     default = "/dont-code"
 
     [install.tenant]
-    ask.en = "The name of the tenant these services will support. This configures database name to use. Can be empty if non necessary."
-    ask.fr = "Le nom du tenant associé a ces services. Permet de configurer une base de donnée séparée. Peut-être vide si non nécessaire."
+    ask.en = "The name of the tenant these services will support. This configures database names to use. Can be empty if not necessary."
+    ask.fr = "Le nom du tenant associé à ces services. Permet de configurer des bases de données séparées. Peut être vide si non nécessaire."
     type = "string"
     optional = true
 
     [install.public_key]
     ask.en = "SSH Public key to allow service updates as part of delivery process, leave empty to disable."
-    ask.fr = "Clef publique SSH permettant la mise à jour des services via une deploiement automatique, inactif si non renseigné."
+    ask.fr = "Clef publique SSH permettant la mise à jour des services via un déploiement automatique, inactif si non renseigné."
     type = "string"
     optional = true
 
     [install.mistral_key]
-    ask.en = "Enable application generation through prompts by setting your Mistral API Keys here, or NONE to disable."
+    ask.en = "Enable application generation through prompts by setting your Mistral API Key here, or NONE to disable."
     ask.fr = "En renseignant une clef d'API Mistral, vous avez la possibilité de générer une application avec un simple prompt, inactif avec la valeur NONE."
     type = "string"
     optional = false
@@ -63,12 +63,12 @@ ram.runtime = "400M"
 
 [resources]
     [resources.sources.main]
-    url = "https://github.com/dont-code/release/releases/download/v0.4.5/dont-code-release-runners.zip"
-    sha256 = "4f8088d2f9fc065d51ab9ab6a19889d28156f797aac77ed07390a6d65375d5f5"
-    in_subdir = false
+    url = "https://github.com/dont-code/dont-code/releases/download/v1.5.1-next/dont-code-1.5.1-next.tar.gz"
+    sha256 = "c9d0b606888c4126f2210a2ed5e2340ec725ab9cf5ecbbff146c8c15b3eb9834"
+    in_subdir = true
     autoupdate.strategy = "latest_github_release"
-    autoupdate.asset = "dont-code-release-runners.zip"
-    autoupdate.upstream = "https://github.com/dont-code/release"
+    autoupdate.asset = "dont-code-.*\\.tar\\.gz"
+    autoupdate.upstream = "https://github.com/dont-code/dont-code"
 
     [resources.system_user]
 
@@ -76,7 +76,7 @@ ram.runtime = "400M"
     group = "www-data:r-x"
 
     [resources.data_dir]
-    subdirs = ["docs"]
+    subdirs = ["docs", "web", "test"]
     owner = "__APP__:rwx"
     group = "www-data:rwx"
 
@@ -84,12 +84,12 @@ ram.runtime = "400M"
     main.url = "/"
 
     [resources.ports]
-    preview.default = 8081
-    ide.default = 8082
     project.default = 8083
     data.default = 8084
 
     [resources.apt]
     packages = [
-        "",
+        "ca-certificates",
+        "curl",
+        "tar",
     ]

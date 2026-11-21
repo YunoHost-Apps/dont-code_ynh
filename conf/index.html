@@ -132,11 +132,10 @@
     req.send();
     }
 
+  // Relative to this page (/test/), so this also works for root-path installs.
   window.onload = function() {
-    checkUri('preview/sessions', 'Preview');
-    // checkUri('ide/', 'Builder');
-    checkUri('project', 'Project');
-    checkUri('data/test', 'Data');
+    checkUri('../project', 'Project');
+    checkUri('../data/test', 'Data');
   };
 
 </script>
@@ -147,13 +146,12 @@
 
 <div class="container">
     <p class="lead">Congratulations, your Dont-code services have been installed.</p>
+    <p><a href="../">Open the dashboard</a></p>
 
     <div>
         <h2>Status of each service:</h2>
 
         <ul>
-            <li>Preview service : <span id="Preview">Checking...</span></li>
-            <li>Builder service : <span id="Builder">Cannot be checked for now.</span></li>
             <li>Project service : <span id="Project">Checking...</span></li>
             <li>Data service : <span id="Data">Checking...</span></li>
         </ul>

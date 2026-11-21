@@ -10,11 +10,13 @@ ynh_script_progression "Setting up source files..."
 
 ynh_setup_source --dest_dir="$install_dir"
 
+#=================================================
+# CONFIGURE DATA STORAGE
+#=================================================
+ynh_script_progression "Configuring data storage..."
 
-#=================================================
-# Configure document storage
-#=================================================
-ynh_script_progression "Configuring document storage..."
+# Deploy the web pages into data_dir so nginx can deliver them.
+deploy_web_files
 
 document_dir=$data_dir/docs
 ynh_app_setting_set --key=document_dir --value="$document_dir"
@@ -22,16 +24,14 @@ ynh_app_setting_set --key=document_dir --value="$document_dir"
 document_url=$(append_uri "https://${domain}${path}" "docs")
 ynh_app_setting_set --key=document_url --value="$document_url"
 
-# Add the status pageindex
-ynh_config_add --template="index.html" --destination="$data_dir/index.html"
+test_dir=$data_dir/test
+ynh_app_setting_set --key=test_dir --value="$test_dir"
+mkdir -p "$test_dir"
+ynh_config_add --template="index.html" --destination="$test_dir/index.html"
 
-# Add the repository pages
-ynh_config_add --template="repository-next.json" --destination="$data_dir/repository-next.json"
-ynh_config_add --template="repository-stable.json" --destination="$data_dir/repository-stable.json"
-
-# We need to allow nginx to read the index and docs files
+mkdir -p "$document_dir"
 chmod -R o-rwx,gu+rwx "$data_dir"
-chown -R $app:www-data "$data_dir"
+chown -R "$app:www-data" "$data_dir"
 
 #=================================================
 # ADD A CONFIGURATION
@@ -47,8 +47,10 @@ ynh_app_setting_set --key=db_user --value="$db_user"
 
 ynh_config_add --template=".env" --destination="$install_dir/.env"
 
-#chmod 400 "$install_dir/.env"
-#chown $app:$app "$install_dir/.env"
+# Render dashboard and host runtime configuration for this YunoHost domain/path.
+render_dashboard_config
+render_host_config
+patch_web_base_href
 
 #=================================================
 # ADD SSH ACCESS
@@ -95,6 +97,11 @@ done
 ynh_script_progression "Adding system configurations related to $app..."
 
 ynh_config_add_nginx
+
+# Normalize root-path placeholders that may produce double slashes.
+if [ "$path" = "/" ]; then
+    sed -i "s|location //|location /|g; s|__PATH__/|/|g; s|__PATH__|/|g" "/etc/nginx/conf.d/$domain.d/$app.conf"
+fi
 
 ynh_config_add_logrotate
 
