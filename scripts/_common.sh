@@ -129,8 +129,8 @@ render_dashboard_config() {
 {
   "name": "Dont-code",
   "description": "Dont-code platform managed by YunoHost.",
-  "projectApiUrl": "${base_url}/project",
-  "generateApiUrl": "${base_url}/generate",
+  "projectApiUrl": "${base_url}/api/project",
+  "generateApiUrl": "${base_url}/api/generate",
   "applicationHostUrl": "${base_url}/apps/host/?repository=default&"
 }
 EOF
@@ -145,9 +145,9 @@ render_host_config() {
 {
   "name": "Dont-code",
   "description": "Dont-code host managed by YunoHost.",
-  "projectApiUrl": "${base_url}/project",
-  "storeApiUrl": "${base_url}/data",
-  "documentApiUrl": "${base_url}/documents",
+  "projectApiUrl": "${base_url}/api/project",
+  "storeApiUrl": "${base_url}/api/data",
+  "documentApiUrl": "${base_url}/api/documents",
   "plugins": [
     {
       "id": "Web",
