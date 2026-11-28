@@ -102,8 +102,32 @@ _install_restart_script_and_sudoers() {
 }
 
 _remove_restart_script_and_sudoers() {
+    ynh_safe_rm "$install_dir/restart-services.sh"
     if [ -f "/etc/sudoers.d/$app-sudoers" ]; then
         ynh_safe_rm "/etc/sudoers.d/$app-sudoers"
+    fi
+}
+
+_configure_ssh_access() {
+    # Keep authorized_keys and the restart helpers in sync with the public_key
+    # setting. Used at install/upgrade time and by scripts/config when the SSH
+    # key is changed from the YunoHost config panel.
+    local ssh_dir="$install_dir/.ssh"
+    local authorized_keys="$ssh_dir/authorized_keys"
+
+    if [ -n "$public_key" ]; then
+        mkdir -p "$ssh_dir"
+        ynh_backup_if_checksum_is_different "$authorized_keys"
+        touch "$authorized_keys"
+        chmod 600 "$authorized_keys"
+        printf '%s\n' "$public_key" > "$authorized_keys"
+        ynh_store_file_checksum "$authorized_keys"
+        chown -R "$app:$app" "$ssh_dir"
+        chmod 700 "$ssh_dir"
+        _install_restart_script_and_sudoers
+    else
+        ynh_safe_rm "$authorized_keys"
+        _remove_restart_script_and_sudoers
     fi
 }
 

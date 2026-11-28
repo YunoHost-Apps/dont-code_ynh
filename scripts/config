@@ -1,0 +1,15 @@
+#!/bin/bash
+
+source /usr/share/yunohost/helpers
+ynh_abort_if_errors
+source "$YNH_APP_BASEDIR/scripts/_common.sh"
+
+# The config panel binds mistral_key directly to the .env file. The SSH key
+# needs a custom setter so that authorized_keys and the restart helpers stay
+# in sync when the key is added, changed or removed from the panel.
+set__public_key() {
+    _configure_ssh_access
+    ynh_app_setting_set --key=public_key --value="$public_key"
+}
+
+ynh_app_config_run "$1"

@@ -1,0 +1,35 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/main/schemas/config_panel.v1.schema.json
+
+version = "1.0"
+
+[main]
+name.en = "Dont-code configuration"
+name.fr = "Configuration Dont-code"
+help.en = "Manage the keys used by the Dont-code services."
+help.fr = "Gérez les clés utilisées par les services Dont-code."
+services = ["__APP__-project", "__APP__-data"]
+
+    [main.keys]
+    name.en = "Service keys"
+    name.fr = "Clés des services"
+    help.en = "Changes are written to the service configuration and applied when the services reload."
+    help.fr = "Les modifications sont écrites dans la configuration des services et appliquées au rechargement de ceux-ci."
+
+        [main.keys.mistral_key]
+        ask.en = "Mistral API key"
+        ask.fr = "Clé d'API Mistral"
+        type = "string"
+        redact = true
+        default = "NONE"
+        help.en = "Set your Mistral API key to enable AI-assisted application generation, or NONE to disable it."
+        help.fr = "Renseignez votre clé d'API Mistral pour activer la génération d'applications par IA, ou NONE pour la désactiver."
+        bind = "quarkus_langchain4j_mistralai_api_key:__INSTALL_DIR__/.env"
+
+        [main.keys.public_key]
+        ask.en = "SSH public key for service uploads"
+        ask.fr = "Clé publique SSH pour la mise à jour des services"
+        type = "text"
+        optional = true
+        help.en = "SSH public key allowed to update the services as part of the delivery process. Leave empty to disable SSH updates."
+        help.fr = "Clé publique SSH autorisée à mettre à jour les services lors des livraisons. Laissez vide pour désactiver les mises à jour SSH."
+        bind = "settings"

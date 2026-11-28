@@ -145,10 +145,7 @@ patch_web_base_href
 # ADD SSH ACCESS
 #=================================================
 
-if [ -n "$public_key" ]; then
-    ynh_script_progression "Upgrading ssh access for dev..."
-    _install_restart_script_and_sudoers
-fi
+_configure_ssh_access
 
 #=================================================
 # UPGRADE SUPPORTING TOOLS

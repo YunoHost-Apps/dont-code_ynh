@@ -56,19 +56,7 @@ patch_web_base_href
 # ADD SSH ACCESS
 #=================================================
 
-if [ -n "$public_key" ]; then
-    ynh_script_progression "Enabling ssh access for dev..."
-    # enable ssh access to the files for updates
-    # todo: Secure it more with https://github.com/YunoHost-Apps/ssh_chroot_dir_ynh
-    mkdir --parents "$install_dir/.ssh"
-    ynh_config_add --template="authorized_keys" --destination="$install_dir/.ssh/authorized_keys"
-
-    chown -R "$app:$app" "$install_dir/.ssh"
-    chmod 700 "$install_dir/.ssh"
-    chmod 600 "$install_dir/.ssh/authorized_keys"
-
-    _install_restart_script_and_sudoers
-fi
+_configure_ssh_access
 
 #=================================================
 # INSTALL SUPPORTING TOOLS

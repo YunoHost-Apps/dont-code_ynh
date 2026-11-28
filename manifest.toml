@@ -7,7 +7,7 @@ name = "Dont-code"
 description.en = "Low-code/no-code platform with dashboard, project/data services and plugin host"
 description.fr = "Plateforme low-code/no-code avec tableau de bord, services projet/données et hôte de plugins"
 
-version = "1.5.1~ynh1"
+version = "1.5.1~ynh3"
 
 maintainers = ["Dont-code Team"]
 
